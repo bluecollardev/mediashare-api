@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: media-svc
+  name: media-svc
+spec:
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    io.kompose.service: media-svc
+  type: ClusterIP  # Change the service type to LoadBalancer

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: tags-svc
+  name: tags-svc
+spec:
+  ports:
+    - port: 80
+      targetPort: 3002
+  selector:
+    io.kompose.service: tags-svc
+  type: ClusterIP

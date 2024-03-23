@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.0 (40646f47)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: user-svc
+  name: user-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: user-svc
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.26.0 (40646f47)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/mediashare-network: "true"
+        io.kompose.service: user-svc
+    spec:
+      containers:
+        - args:
+            - npx
+            - nx
+            - serve
+            - user-svc
+            - --host=0.0.0.0
+            - --configuration=development
+            - --skip-nx-cache
+            - --verbose
+          env:
+            - name: APP_HOST
+              value: 0.0.0.0
+            - name: APP_NAME
+              value: UserSvc
+            - name: APP_PREFIX
+            - name: APP_TITLE
+              value: UserSvc
+            - name: DB
+              value: mediashare
+            - name: DB_HOST
+              value: db
+            - name: DB_IS_ATLAS
+              value: "true"
+            - name: DB_SSL
+              value: "false"
+            - name: DB_SYNCHRONIZE
+              value: "true"
+            - name: DB_TYPE
+              value: mongodb
+            - name: DB_URL
+              value: mongodb://db:27017/
+            - name: DB_USERNAME
+              value: mongodb
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3001"
+            - name: SESSION_DB_COLLECTION
+              value: session
+            - name: SESSION_DB_NAME
+              value: api-session
+            - name: SESSION_SECRET
+              value: this-is-my-secret-key
+          image: registry.gitlab.com/technologycompany/mediashare/user-svc-dev:bf26a945
+          name: user-svc
+          ports:
+            - containerPort: 3001
+          resources: {}
+      restartPolicy: Always
+status: {}
