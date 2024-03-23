@@ -21,7 +21,7 @@ spec:
         kompose.version: 1.26.0 (40646f47)
       creationTimestamp: null
       labels:
-        io.kompose.network/mediashare-network: "true"
+        io.kompose.network/mediashare-network: 'true'
         io.kompose.service: media-svc
     spec:
       containers:
@@ -46,11 +46,11 @@ spec:
             - name: DB_HOST
               value: db
             - name: DB_IS_ATLAS
-              value: "true"
+              value: 'true'
             - name: DB_SSL
-              value: "false"
+              value: 'false'
             - name: DB_SYNCHRONIZE
-              value: "true"
+              value: 'true'
             - name: DB_TYPE
               value: mongodb
             - name: DB_URL
@@ -60,7 +60,7 @@ spec:
             - name: NODE_ENV
               value: production
             - name: PORT
-              value: "3000"
+              value: '3000'
             - name: SESSION_DB_COLLECTION
               value: session
             - name: SESSION_DB_NAME

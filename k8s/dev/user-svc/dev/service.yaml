@@ -14,4 +14,4 @@ spec:
       targetPort: 3001
   selector:
     io.kompose.service: user-svc
-  type: ClusterIP  # Set the service type to NodePort
+  type: ClusterIP # Set the service type to NodePort

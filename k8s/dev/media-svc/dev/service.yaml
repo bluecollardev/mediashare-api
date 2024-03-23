@@ -14,4 +14,4 @@ spec:
       targetPort: 3000
   selector:
     io.kompose.service: media-svc
-  type: ClusterIP  # Change the service type to LoadBalancer
+  type: ClusterIP # Change the service type to LoadBalancer

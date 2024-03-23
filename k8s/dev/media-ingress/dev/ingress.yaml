@@ -8,39 +8,39 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
-  - hosts:
-    - media-api.dev.afehrpt.com
-    - user-api.dev.afehrpt.com
-    - tags-api.dev.afehrpt.com
-    secretName: media-ingress-tls
+    - hosts:
+        - media-api.dev.afehrpt.com
+        - user-api.dev.afehrpt.com
+        - tags-api.dev.afehrpt.com
+      secretName: media-ingress-tls
   rules:
-  - host: "media-api.dev.afehrpt.com"
-    http:
-      paths:
-      - path: "/"
-        pathType: Prefix
-        backend:
-          service:
-            name: media-svc
-            port:
-              number: 80
-  - host: "user-api.dev.afehrpt.com"
-    http:
-      paths:
-      - path: "/"
-        pathType: Prefix
-        backend:
-          service:
-            name: user-svc
-            port:
-              number: 80
-  - host: "tags-api.dev.afehrpt.com"
-    http:
-      paths:
-      - path: "/"
-        pathType: Prefix
-        backend:
-          service:
-            name: tags-svc
-            port:
-              number: 80
+    - host: 'media-api.dev.afehrpt.com'
+      http:
+        paths:
+          - path: '/'
+            pathType: Prefix
+            backend:
+              service:
+                name: media-svc
+                port:
+                  number: 80
+    - host: 'user-api.dev.afehrpt.com'
+      http:
+        paths:
+          - path: '/'
+            pathType: Prefix
+            backend:
+              service:
+                name: user-svc
+                port:
+                  number: 80
+    - host: 'tags-api.dev.afehrpt.com'
+      http:
+        paths:
+          - path: '/'
+            pathType: Prefix
+            backend:
+              service:
+                name: tags-svc
+                port:
+                  number: 80

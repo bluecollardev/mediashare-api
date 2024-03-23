@@ -10,11 +10,10 @@ metadata:
   name: db
 spec:
   ports:
-    - name: "27017"
+    - name: '27017'
       port: 27017
       targetPort: 27017
   selector:
     io.kompose.service: db
 status:
   loadBalancer: {}
-

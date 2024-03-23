@@ -21,7 +21,7 @@ spec:
         kompose.version: 1.26.0 (40646f47)
       creationTimestamp: null
       labels:
-        io.kompose.network/mediashare-network: "true"
+        io.kompose.network/mediashare-network: 'true'
         io.kompose.service: tags-svc
     spec:
       containers:
@@ -45,23 +45,23 @@ spec:
             - name: DB
               value: mediashare
             - name: DB_HOST
-              value: cluster0.8x36b.mongodb.net  # Update with your Atlas cluster hostname
+              value: cluster0.8x36b.mongodb.net # Update with your Atlas cluster hostname
             - name: DB_IS_ATLAS
-              value: "true"
+              value: 'true'
             - name: DB_SSL
-              value: "true"  # Ensure SSL is enabled for MongoDB Atlas
+              value: 'true' # Ensure SSL is enabled for MongoDB Atlas
             - name: DB_SYNCHRONIZE
-              value: "true"
+              value: 'true'
             - name: DB_TYPE
               value: mongodb
             - name: DB_URL
-              value: mongodb+srv://msuser2:9oKsZ0fDEzXItjSt@cluster0.8x36b.mongodb.net/mediashare?retryWrites=true&w=majority  # Update with your Atlas connection string
+              value: mongodb+srv://msuser2:9oKsZ0fDEzXItjSt@cluster0.8x36b.mongodb.net/mediashare?retryWrites=true&w=majority # Update with your Atlas connection string
             - name: DB_USERNAME
               value: msuser2
             - name: NODE_ENV
               value: production
             - name: PORT
-              value: "3002"
+              value: '3002'
             - name: SESSION_DB_COLLECTION
               value: session
             - name: SESSION_DB_NAME

@@ -1,7 +1,7 @@
 const { writeFileSync } = require('fs');
 
 const createBaseFile = () =>
-`stages:
+  `stages:
   - publish
 `;
 
@@ -25,7 +25,9 @@ publish:${service}:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build --pull --cache-from $CI_REGISTRY_IMAGE --tag $CI_REGISTRY_IMAGE/${env === 'dev' ? service + '-dev' : service}:$TAG_NAME .
+    - docker build --pull --cache-from $CI_REGISTRY_IMAGE --tag $CI_REGISTRY_IMAGE/${
+      env === 'dev' ? service + '-dev' : service
+    }:$TAG_NAME .
     - docker push $CI_REGISTRY_IMAGE/${service}-dev:$TAG_NAME
 `;
 
@@ -34,7 +36,9 @@ const createCIFile = (services, env) => {
     return createBaseFile().concat(createEmptyJob());
   }
 
-  return createBaseFile().concat(services.map((service) => createJob(service, env)).join('\n'));
+  return createBaseFile().concat(
+    services.map((service) => createJob(service, env)).join('\n')
+  );
 };
 
 const createDynamicGitLabFile = () => {
