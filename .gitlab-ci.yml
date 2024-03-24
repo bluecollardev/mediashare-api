@@ -71,18 +71,18 @@ dev-triggers-all:
 dev-deploy:
   stage: dev-deploy
   when: manual
-#  needs:
-#    - job: dev-triggers-affected
-#      optional: true
-#    - job: dev-triggers-all
-#      optional: true
+  #  needs:
+  #    - job: dev-triggers-affected
+  #      optional: true
+  #    - job: dev-triggers-all
+  #      optional: true
   script:
     - apk update && apk add git
     - git config --global user.email "lucaslopatka@gmail.com"
     - git config --global user.name "Lucas Lopatka"
     - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
     - cd temp_repo
-    - git checkout k8s || git checkout develop && git -b checkout k8s
+    - git remote -v && (git checkout k8s || git checkout develop && git checkout -b k8s)
     - sed -i "s/user-svc:.*/user-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_1
     - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_2
     - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_3
@@ -159,7 +159,7 @@ prod-deploy:
     - git config --global user.name "Lucas Lopatka"
     - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
     - cd temp_repo
-    - git checkout k8s || git checkout master && git -b checkout k8s
+    - git remote -v && (git checkout k8s || git checkout master && git checkout -b k8s)
     - sed -i "s/user-svc:.*/user-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_1
     - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_2
     - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_3
