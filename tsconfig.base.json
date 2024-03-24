@@ -10,22 +10,46 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strictPropertyInitialization": false,
     "baseUrl": ".",
     "paths": {
-      "@mediashare/api-lib": ["libs/api-lib/src/index.ts"],
-      "@mediashare/core": ["libs/core/src/index.ts"],
-      "@mediashare/core/*": ["libs/core/src/lib/*"],
-      "@mediashare/media-svc/*": ["apps/media-svc/*"],
-      "@mediashare/shared": ["libs/shared/src/index.ts"],
-      "@mediashare/shared/*": ["libs/shared/src/lib/*"],
-      "@mediashare/user-svc-e2e/*": ["apps/user-svc-e2e/*"],
-      "@mediashare/user-svc/*": ["apps/user-svc/*"],
-      "@mediashare/utility": ["libs/utility/src/index.ts"]
+      "@mediashare/api-lib": [
+        "libs/api-lib/src/index.ts"
+      ],
+      "@mediashare/core": [
+        "libs/core/src/index.ts"
+      ],
+      "@mediashare/core/*": [
+        "libs/core/src/lib/*"
+      ],
+      "@mediashare/media-svc/*": [
+        "apps/media-svc/*"
+      ],
+      "@mediashare/shared": [
+        "libs/shared/src/index.ts"
+      ],
+      "@mediashare/shared/*": [
+        "libs/shared/src/lib/*"
+      ],
+      "@mediashare/user-svc-e2e/*": [
+        "apps/user-svc-e2e/*"
+      ],
+      "@mediashare/user-svc/*": [
+        "apps/user-svc/*"
+      ],
+      "@mediashare/utility": [
+        "libs/utility/src/index.ts"
+      ]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
 }

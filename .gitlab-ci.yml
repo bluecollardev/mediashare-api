@@ -92,6 +92,8 @@ dev-deploy:
 
 prod-build-affected:
   stage: prod-build-affected
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
   script:
     - npm ci --force
     - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --affected --base=HEAD~1 --json)"
@@ -104,6 +106,8 @@ prod-build-affected:
 
 prod-build-all:
   stage: prod-build-all
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
   when: manual
   script:
     - npm ci --force
@@ -117,6 +121,8 @@ prod-build-all:
 
 prod-triggers-affected:
   stage: prod-triggers-affected
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
   needs:
     - prod-build-affected
   trigger:
@@ -127,6 +133,8 @@ prod-triggers-affected:
 
 prod-triggers-all:
   stage: prod-triggers-all
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
   needs:
     - prod-build-all
   trigger:
@@ -137,6 +145,8 @@ prod-triggers-all:
 
 prod-deploy:
   stage: prod-deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
   when: manual
   needs:
     - job: prod-triggers-affected
