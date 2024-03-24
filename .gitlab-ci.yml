@@ -87,7 +87,7 @@ dev-deploy:
   #    - job: dev-triggers-all
   #      optional: true
   script:
-    - apk update && apk add git
+    # - apk update && apk add git
     - git config --global user.email "lucaslopatka@gmail.com"
     - git config --global user.name "Lucas Lopatka"
     - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
@@ -98,7 +98,7 @@ dev-deploy:
     - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_2
     - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_3
     - git add .
-    - git commit -m "Update Kubernetes deployment services with new image tags"
+    - git commit -m "Update image tags ${CI_COMMIT_SHORT_SHA}" && git log -v
     - git push origin HEAD:k8s
 
 prod-build-affected:
@@ -165,7 +165,7 @@ prod-deploy:
     - job: prod-triggers-all
       optional: true
   script:
-    - apk update && apk add git
+    # - apk update && apk add git
     - git config --global user.email "lucaslopatka@gmail.com"
     - git config --global user.name "Lucas Lopatka"
     - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
@@ -176,5 +176,5 @@ prod-deploy:
     - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_2
     - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_3
     - git add .
-    - git commit -m "Update Kubernetes deployment services with new image tags"
+    - git commit -m "Update image tags ${CI_COMMIT_SHORT_SHA}" && git log -v
     - git push origin HEAD:k8s
