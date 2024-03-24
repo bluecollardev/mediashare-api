@@ -26,7 +26,7 @@ variables:
 dev-build-affected:
   stage: dev-build-affected
   rules:
-    - if: $CI_COMMIT_BRANCH != "k8s"
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
   script:
     - npm ci --force
     - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --affected --base=HEAD~1 --json)" dev
@@ -40,7 +40,7 @@ dev-build-affected:
 dev-build-all:
   stage: dev-build-all
   rules:
-    - if: $CI_COMMIT_BRANCH != "k8s"
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
   when: manual
   script:
     - npm ci --force
@@ -55,7 +55,7 @@ dev-build-all:
 dev-triggers-affected:
   stage: dev-triggers-affected
   rules:
-    - if: $CI_COMMIT_BRANCH != "k8s"
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
   needs:
     - dev-build-affected
   trigger:
@@ -67,7 +67,7 @@ dev-triggers-affected:
 dev-triggers-all:
   stage: dev-triggers-all
   rules:
-    - if: $CI_COMMIT_BRANCH != "k8s"
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
   needs:
     - dev-build-all
   trigger:
@@ -79,7 +79,7 @@ dev-triggers-all:
 dev-deploy:
   stage: dev-deploy
   rules:
-    - if: $CI_COMMIT_BRANCH != "k8s"
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
   when: manual
   #  needs:
   #    - job: dev-triggers-affected
