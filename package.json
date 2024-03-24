@@ -30,7 +30,8 @@
     "format:check": "nx format:check",
     "format:write": "nx format:write",
     "format": "nx format:write",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "kube:setup": "doctl auth init && doctl kubernetes cluster kubeconfig save a6f4337d-ba83-4829-a9fc-50ea2727bc4e"
   },
   "private": true,
   "dependencies": {

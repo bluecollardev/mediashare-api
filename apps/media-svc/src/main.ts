@@ -61,11 +61,11 @@ async function bootstrap() {
           description: `local`,
         },
         {
-          url: `https://mediashare-api-staging.herokuapp.com`,
+          url: `https://media-api.dev.afehrpt.com`,
           description: `staging`,
         },
         {
-          url: `https://mediashare-api-prod.herokuapp.com`,
+          url: `https://media-api.afehrpt.com`,
           description: `production`,
         },
       ],

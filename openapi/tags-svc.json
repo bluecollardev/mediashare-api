@@ -126,11 +126,11 @@
       "description": "local"
     },
     {
-      "url": "https://mediashare-api-staging.herokuapp.com",
+      "url": "https://tags-api.dev.afehrpt.com",
       "description": "staging"
     },
     {
-      "url": "https://mediashare-api-prod.herokuapp.com",
+      "url": "https://tags-api.afehrpt.com",
       "description": "production"
     }
   ],
