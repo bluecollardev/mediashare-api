@@ -82,7 +82,8 @@ dev-deploy:
     - git config --global user.name "Lucas Lopatka"
     - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
     - cd temp_repo
-    - git remote -v && (git checkout k8s || git checkout develop && git checkout -b k8s)
+    # - git remote -v && (git checkout k8s || git checkout develop && git checkout -b k8s)
+    - git checkout k8s
     - sed -i "s/user-svc:.*/user-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_1
     - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_2
     - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_3
@@ -159,7 +160,8 @@ prod-deploy:
     - git config --global user.name "Lucas Lopatka"
     - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
     - cd temp_repo
-    - git remote -v && (git checkout k8s || git checkout master && git checkout -b k8s)
+    # - git remote -v && (git checkout k8s || git checkout master && git checkout -b k8s)
+    - git checkout k8s
     - sed -i "s/user-svc:.*/user-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_1
     - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_2
     - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_3
