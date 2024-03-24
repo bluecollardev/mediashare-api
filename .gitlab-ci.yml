@@ -71,11 +71,11 @@ dev-triggers-all:
 dev-deploy:
   stage: dev-deploy
   when: manual
-  needs:
-    - job: dev-triggers-affected
-      optional: true
-    - job: dev-triggers-all
-      optional: true
+#  needs:
+#    - job: dev-triggers-affected
+#      optional: true
+#    - job: dev-triggers-all
+#      optional: true
   script:
     - apk update && apk add git
     - git config --global user.email "lucaslopatka@gmail.com"
