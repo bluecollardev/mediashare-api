@@ -17,7 +17,7 @@ publish:${service}:
   stage: publish
   image: docker
   variables:
-    SERVICE: ${service}-dev
+    SERVICE: ${env === 'dev' ? service + '-dev' : service}
     TAG_NAME: $CI_COMMIT_SHORT_SHA
   services:
     - name: docker:dind
@@ -25,10 +25,8 @@ publish:${service}:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build --pull --cache-from $CI_REGISTRY_IMAGE --tag $CI_REGISTRY_IMAGE/${
-      env === 'dev' ? service + '-dev' : service
-    }:$TAG_NAME .
-    - docker push $CI_REGISTRY_IMAGE/${service}-dev:$TAG_NAME
+    - docker build --pull --cache-from $CI_REGISTRY_IMAGE --tag $CI_REGISTRY_IMAGE/${env === 'dev' ? service + '-dev' : service}:$TAG_NAME .
+    - docker push $CI_REGISTRY_IMAGE/${env === 'dev' ? service + '-dev' : service}:$TAG_NAME
 `;
 
 const createCIFile = (services, env) => {

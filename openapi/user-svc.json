@@ -529,11 +529,11 @@
       "description": "local"
     },
     {
-      "url": "https://media-api.dev.afehrpt.com",
+      "url": "https://user-api.dev.afehrpt.com",
       "description": "staging"
     },
     {
-      "url": "https://media-api.afehrpt.com",
+      "url": "https://user-api.afehrpt.com",
       "description": "production"
     }
   ],
