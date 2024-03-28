@@ -81,11 +81,11 @@ dev-deploy:
   rules:
     - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
   when: manual
-  #  needs:
-  #    - job: dev-triggers-affected
-  #      optional: true
-  #    - job: dev-triggers-all
-  #      optional: true
+  needs:
+    - job: dev-triggers-affected
+      optional: true
+    - job: dev-triggers-all
+      optional: true
   script:
     # - apk update && apk add git
     - git config --global user.email "lucaslopatka@gmail.com"
