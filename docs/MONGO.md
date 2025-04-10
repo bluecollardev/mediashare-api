@@ -10,4 +10,4 @@ TODO: Make a quick CLI tool for this...
 `mongorestore --gzip --archive=mediashare-backup.20230125-1907.tar.gz --drop --uri mongodb+srv://<USER>:<PASSWORD>@cluster0.8x36b.mongodb.net`
 `mongorestore --gzip --archive=mediashare-backup.20230125-1907.tar.gz --drop --uri mongodb+srv://<USER>:<PASSWORD>@cluster0.nureuqr.mongodb.net`
 `mongorestore --gzip --archive=mediashare-backup.20231230-153439.with-demo-users.tar.gz --drop`
-`mongorestore --gzip --archive=mediashare-backup.20231230-153439.with-demo-users.tar.gz --nsInclude="mediashare.*" --nsFrom="mediashare.*" --nsTo="test.*" --drop`
+`mongorestore --gzip --archive=mediashare-backup.20231230-153439.with-demo-users.tar.gz --nsInclude="mediashare._" --nsFrom="mediashare._" --nsTo="test.\*" --drop`

@@ -22,90 +22,6 @@
           }
         }
       }
-    },
-    "/api/tags/{tagId}": {
-      "delete": {
-        "operationId": "TagController_remove",
-        "parameters": [
-          {
-            "name": "tagId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["tags"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "get": {
-        "operationId": "TagController_findOne",
-        "parameters": [
-          {
-            "name": "tagId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TagDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": ["tags"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/tags": {
-      "get": {
-        "operationId": "TagController_findAll",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TagDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": ["tags"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
     }
   },
   "info": {
@@ -142,37 +58,6 @@
         "type": "http"
       }
     },
-    "schemas": {
-      "TagDto": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string",
-            "example": "Cjiw5p5vC1EIZzLBFWqkS5pu5UjGVkYBYVdlwrhBL159zPcqjndBOt8hotfWqMSmcQ4xZFYJXhZaCXUkxgMbs0txIsTYGiz6AQ7Q1quqKOdMfQDJBDuuQqzAW3bp5",
-            "maxLength": 255,
-            "minLength": 0
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "readOnly": true
-          },
-          "updatedDate": {
-            "format": "date-time",
-            "type": "string",
-            "readOnly": true
-          },
-          "tags": {
-            "description": "tags",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TagDto"
-              }
-            ]
-          }
-        },
-        "required": ["_id", "tags"]
-      }
-    }
+    "schemas": {}
   }
 }
