@@ -1,11 +1,7 @@
 import { classes } from '@automapper/classes';
 import { AutomapperModule } from '@automapper/nestjs';
 import { TypeOrmModuleFactory } from '@mediashare/core/factories';
-import {
-  appConfig,
-  appValidationSchema,
-  dbConfig,
-} from '@mediashare/media-svc/src/app/app.configuration';
+import { appConfig, appValidationSchema, dbConfig } from './app.configuration';
 import { CognitoAuthModule } from '@nestjs-cognito/auth';
 import { CognitoModuleOptions } from '@nestjs-cognito/core';
 import { CognitoTestingModule } from '@nestjs-cognito/testing';
