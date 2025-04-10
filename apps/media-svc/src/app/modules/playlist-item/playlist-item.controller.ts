@@ -18,7 +18,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { ParamTokens, RouteTokens } from '../../core/constants';
+import { ParamTokens, RouteTokens } from '@mediashare/core/constants';
 import { MEDIA_VISIBILITY } from '../../core/models';
 import {
   PlaylistItemGetResponse,

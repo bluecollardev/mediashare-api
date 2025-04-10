@@ -1,7 +1,11 @@
 import { classes } from '@automapper/classes';
 import { AutomapperModule } from '@automapper/nestjs';
 import { TypeOrmModuleFactory } from '@mediashare/core/factories';
-import { appConfig, appValidationSchema, dbConfig } from '@mediashare/media-svc/src/app/app.configuration';
+import {
+  appConfig,
+  appValidationSchema,
+  dbConfig,
+} from '@mediashare/media-svc/src/app/app.configuration';
 import { CognitoAuthModule } from '@nestjs-cognito/auth';
 import { CognitoModuleOptions } from '@nestjs-cognito/core';
 import { CognitoTestingModule } from '@nestjs-cognito/testing';
@@ -12,6 +16,7 @@ import { DataSource } from 'typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TagModule } from './modules/tag/tag.module';
 
 @Module({
   imports: [
@@ -50,6 +55,7 @@ import { AppService } from './app.service';
       },
     } as CognitoModuleOptions),
     LoggerModule.forRoot(),
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService],

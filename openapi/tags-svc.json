@@ -22,6 +22,176 @@
           }
         }
       }
+    },
+    "/api/tags": {
+      "post": {
+        "operationId": "TagController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "TagController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/tags/{tagId}": {
+      "put": {
+        "operationId": "TagController_update",
+        "parameters": [
+          {
+            "name": "tagId",
+            "required": true,
+            "in": "path",
+            "example": "123",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tag"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "TagController_remove",
+        "parameters": [
+          {
+            "name": "tagId",
+            "required": true,
+            "in": "path",
+            "example": "123",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "TagController_findOne",
+        "parameters": [
+          {
+            "name": "tagId",
+            "required": true,
+            "in": "path",
+            "example": "123",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -58,6 +228,140 @@
         "type": "http"
       }
     },
-    "schemas": {}
+    "schemas": {
+      "CreateTagDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "C9G7e6StVIzN2i2Oy2E60pJ52kNzFSG74mPWOnRvSCSVdGLUsqLpmVyId6HfwcDGdIBt5GpMY9AkpYR9PmgKs3vQPSSt8wnVZrG8k50D1sDjcjh6xb3sC2DjigGt0",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "readOnly": true
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string",
+            "readOnly": true
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "isMediaTag": {
+            "type": "boolean"
+          },
+          "isPlaylistTag": {
+            "type": "boolean"
+          },
+          "parentIds": {
+            "nullable": true,
+            "items": {
+              "type": "array"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "_id",
+          "key",
+          "value",
+          "isMediaTag",
+          "isPlaylistTag",
+          "parentIds"
+        ]
+      },
+      "TagDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "C9G7e6StVIzN2i2Oy2E60pJ52kNzFSG74mPWOnRvSCSVdGLUsqLpmVyId6HfwcDGdIBt5GpMY9AkpYR9PmgKs3vQPSSt8wnVZrG8k50D1sDjcjh6xb3sC2DjigGt0",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "readOnly": true
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string",
+            "readOnly": true
+          },
+          "tags": {
+            "description": "tags",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TagDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "_id",
+          "tags"
+        ]
+      },
+      "UpdateTagDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ObjectId": {
+        "type": "object",
+        "properties": {}
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "Mi4WxagIpaACXyRtckvIeTcJusir6Tl7jyMcCDg01fT3lk7rYlu5W5yOcIP3LKih5LMH5is1myXsRrG6x3RbPgXYTHmM9RmwlmmNW7bEEMwKlDkUVAh5M9eR0PQgX",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "value": {
+            "type": "string",
+            "example": "w5EP5veAp2lGiqabEyMZyGab0AMPWpUAXXKTUH8FJIbjYws1r479VuqXzLy1ZnthEv6Oxg60pTi3a5u7ByXwbGAEU2MX4sDYsXrpVHcyXU7uVhJH204G9OLxqpjn0",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "imageSrc": {
+            "type": "string",
+            "nullable": true
+          },
+          "isMediaTag": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "isPlaylistTag": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "parentIds": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObjectId"
+            }
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "imageSrc",
+          "isMediaTag",
+          "isPlaylistTag",
+          "parentIds"
+        ]
+      }
+    }
   }
 }
