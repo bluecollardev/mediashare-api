@@ -594,47 +594,47 @@
         "properties": {
           "createdAt": {
             "type": "string",
-            "example": "JwNauH2F40pDZAacD8882n4x2e61DYSDx18cjJgjomh9SMMYGeItsGWIxd4OxFcS25FYFCv7aXAMP26EFETUTZaWsjjLWLYE6PZ1FQzRFiHsjjuaqiZ0Q1hQIqBiE",
+            "example": "xuH3Vopv3IKsvdXwfUn4oGf3JNm9g7qecuT4vFBDKWA4FxN0uC385lsZedXuLNPHnWkhPDqZd80w3ExAbuEa46gxPXSOnGhoJ86klVMoZ0PZ0zAgmkeChSkl2wRYu",
             "maxLength": 255,
             "minLength": 0
           },
           "authorImage": {
             "type": "string",
-            "example": "ElVSgODbfPc2oaWfPjexmrBj6Oyu3ViS8PNIGvd2njETnusSFLBHGLNc4JAhLGoOmU7dTOqOtqZVLgSTDw2NrVRuY1j4IJW4g2djiSE3vCRzEsrJq3TBjVOWAYs9i",
+            "example": "D7JgkjkModUYGJmf5lP5Vw5DpAPzKfRYCC18vaZ1i6W0csARHZY8RuZI8038QeuVS3Ps0QKA9EPsAcWe9xspRiOAvbwGvyXByXNVfYEVQXvv2i3hISaKN61yTH7i2",
             "maxLength": 255,
             "minLength": 0
           },
           "authorName": {
             "type": "string",
-            "example": "xK3yPwQoRlebpv4ikHlwkQVdCrpb64PWtRi3x9Rjh6O5F492skSDmuMVBNUF5QFlGcykzXF3QajIoH54HLkEIlxziUkr55A00slU7aD6gjWRaXhe5FQaQn2VwToku",
+            "example": "kXJnoEZR5eN3bavztWhIsX9eDuWdsjyC17ONcsQhge5l6HmvRAwUNHxDS1pCql2sNaH1hknGA5JfGKIlgV0qKV2lCD5yNuEO7u2hyyEmiBzj7UfAMFW1BdtoSUNwY",
             "maxLength": 255,
             "minLength": 0
           },
           "author": {
             "type": "string",
-            "example": "1I5foHLRY5HJTaD3A9wMHstRtQY6Gb0tmfO8Be4KzJ7cZ8vxrNiKIS6rfabJCXz1e2XIP0M2wzzOvdW5TzHBrAMVwWqa21a3K5QkN2SvpAFxhgjU2Cv7p658Ki0EX",
+            "example": "5SrpCXBVhmpktWYEd6JcTnEaSxWy9lFrcTVSTAyMjoNQiYoadP9Q9HDxdIDEBa8CxpyyXff7IXub17lJDGbK78rl1M81eLBeLRuSCmOBxcQwucKEEaTdywOpMzYCO",
             "maxLength": 255,
             "minLength": 0
           },
           "authorId": {
             "type": "string",
-            "example": "67f8248b8ffe9aeee2932340",
+            "example": "67f824d46899f1216d099380",
             "readOnly": false
           },
           "imageSrc": {
             "type": "string",
-            "example": "5JlTLfDkSzPtd3W9homWBspGp0Cr7jJj6PIi2AsccfeYmWTpXWYEjWrlpN2ilqFmY3NL7GWFFFErE1xJ2zvqBnEY6wKpGSGPNhuYgV0aFEqeBi2T6WRXI6RICNEFc",
+            "example": "A1Mt4SqBKqnNt4mHrSxoF44xhLKuKxUFkyhvUf2jAFucIenEA13kKJZLKfe1Y6FSph15oCm9E0pqSqLnY74DpAux4TuEKP95TaRnf1mgCuy4b4KJDRlkp4DJ8LFw3",
             "maxLength": 255,
             "minLength": 0
           },
           "playlistId": {
             "type": "string",
-            "example": "67f8248b8ffe9aeee2932340",
+            "example": "67f824d46899f1216d099380",
             "readOnly": false
           },
           "shareId": {
             "type": "string",
-            "example": "67f8248b8ffe9aeee2932340",
+            "example": "67f824d46899f1216d099380",
             "readOnly": false
           },
           "read": {
@@ -642,7 +642,7 @@
           },
           "title": {
             "type": "string",
-            "example": "rFM6TNgRItKvdBEdmXdRsjClYcV4Lt19KPlogGCS5aNFzfpZ1oRlWP2Ici4l4LaG7wOWpynrcDkqU7ePxxisBhlvEQVuEmrv91vVoC4uaPPducpue1umovmHp8nO7",
+            "example": "2HPuzSs1SogUKZs82ZJHobhtpLX5pV1ZXYYJ2znduRd0rbx06Q7sarycE4CLdaa4y64Y2kf2v15y8Chj4Aj6KPL29NRP7AJ90Q8nBEM5FUiiqCOhPs9vFMgIG5OX5",
             "maxLength": 255,
             "minLength": 0
           }
@@ -665,37 +665,37 @@
         "properties": {
           "_id": {
             "type": "string",
-            "example": "l8kQ4GgyJp5l46Mdcm47sRCOI5j7WdZD5foDuxNZQjxOI60ahBKI28V2Pfcttl81OQA8xW7Y4u044Cu7KMlQ3KQkvWAunJ9Os3Ae0iZyelvFa33WK8eLiRXp718zQ",
+            "example": "72GJnBGuURyQ6qT3U8Lelf2fQcbsdaPTBsyit0OhtxkmjmHKeqFCCFx4VdAYO1ub5UZdhYOqlXGYg0VD2VOlG16isn6wOkz2E2XcI7N2Scjd93hXb0J30kgNevank",
             "maxLength": 255,
             "minLength": 0
           },
           "createdBy": {
             "type": "string",
-            "example": "xYgL0XOHzbNo8SDpxQZxzie4J42krornKbaUVreWrTAaOUyXypTKz55SNOVCkLLx2XjNyTeIbHEfmSKZPtuJirvuMl635qNf0o5vlinDjC39bleetOVYRg6Jn2vCo",
+            "example": "fDqm1lNP5kVJdJobRvg3OUpTQUD9kZcnu9dURnokzoRvJdgQiQLVC0A8mtl6FwP6GKFTQcLAssq84esdBCRDjg5aXa9y2mfjNmd2p7iaZCiyHb5S6AqcCu7CUo0MF",
             "maxLength": 255,
             "minLength": 0
           },
           "imageSrc": {
             "type": "string",
-            "example": "TGWOaEOLVZwmFyXFAQ9RBIek5xXI4fhFKSjjCe9cmSAGBcBWyhDjYxtUAfMQHs3b3eSlB33yi8iDJ2IPszftYs7zYr5ZP0KycSP2v7me9hUzvaaYKGihibkLm9Bwg",
+            "example": "XVXRFyTnuKEyb9ANadCjY3KFqDIQ1t7MyCHaakuhTaQoPyrPTN0wMmKulEIyeHTJs8tRbVcZ856js9H3OtwdZdf2BJdAqlVnzF6Z1iQIlbRGHkwbl9nMIutkecsvx",
             "maxLength": 255,
             "minLength": 0
           },
           "firstName": {
             "type": "string",
-            "example": "yVMg9AkWYcQlwe4Z9OeiibYaGN4we4bsczJLVZGrCD4OwQ6bi5BQVesOOCPd2WScXCYSE2wYDXelqUCy0TArosdTpOiN42pVjV0qdJPW0TNUZs2K57WI49YJv3Mxn",
+            "example": "j8WLGPPUmcxeDZU9lCPr6u54TOZFZNtUtMdSAzUXrzXE8ta8WjrZManyVOZJ2g7nYYdBeC317dpITN4KIiXJSpi1N8ivG3QO6EhtWhsxNFwliTSv1i3PV6K0ln5cu",
             "maxLength": 255,
             "minLength": 0
           },
           "lastName": {
             "type": "string",
-            "example": "ZFYItgBvCjjEQJFTm0L6RvdaRZKCsOPVxtnQhli3Ug9PjxI8SssVCeZFMSY0m3XksaoBbE1iaXwe7QogiyeGbxz73aG3uHeDUyhyt0hfbd2v1WBLZUU8dDuSIUwlH",
+            "example": "5ATnTjJlNiHRbWtJfw6S48W971Y7nu6qKlleLVSEscy1DlWAimJvanf0ZGuNtG0LEIGTiFwLBzAwlEuCjBpCOGqMRgHXMRMVJW5XwZlR3Jd5Xm6O3JrJR6uKVJJCK",
             "maxLength": 255,
             "minLength": 0
           },
           "email": {
             "type": "string",
-            "example": "FPt5khUaTYit605ZNV5l7Hsa1NpFzHvoRvQF6nXzWh25lxd4QydaSk3qQaAYKfTXyjUvcokACFzBOEW9pBeTTN3N8HqSKgkGgi5QhS9ECCzYoxj3T06rSLcQpuMHy",
+            "example": "naq2pQf3UuYKwXQ2HuzFERR3ZkUAxITazeP7h6Y6MjagpaWOJwKCq9hSYuuDZ3Sc6p5Avp8Br5Dn30C3TG2EGlrFBSSuddQezxIIZ8sQTsfYrW9LHO2gow03vFsLx",
             "maxLength": 255,
             "minLength": 0
           },
@@ -704,19 +704,19 @@
           },
           "phoneNumber": {
             "type": "string",
-            "example": "9HVtWLRN5ju5PdXu43j1Zg2IM4NKop6a6JyiRldJH42CALAD8kqnwbkQuuLncn7ybIUJj8Z2xDSOiCfsmwt3l70eh4qaZm9AMRzlFLkJiZf8FjHtmNlaL5wSrj3bY",
+            "example": "9qPa1gcqLP4EZNPjmod5jiWtCqBSzuRskxETRnAoaImbMpsArIWPrr5j6w5CvsnV34wmtKejOywYrPPGIDPNbSdRnd94JhUTRPOBKs9Z4TrB3mJrUHBQ9NHXj6yxZ",
             "maxLength": 255,
             "minLength": 0
           },
           "isDisabled": {
             "type": "string",
-            "example": "hMIxPREfpOh9bKFZQ4T6c62bWOB8wzB2RwKohYV54bK8rOwnDqh7NAPCw4Pn0G2yrs6eU7wlJ6a2Nkp3Ndx7JGF6fKEHN7WOMr6jgcHTpLMb9Z5TPkJ9nYI7mThCz",
+            "example": "iNaYuAAkWeZLHMXWAPN6GfKz9wVLNnxzfvI4jcDHORLXjBxkoHRwyAqM1J2Zi9WtLPsRYr7aZtDm6zCODKA9OdHvbgrgVs5JYaWJfEK88k7RZGhWs1JokehjYYZ9L",
             "maxLength": 255,
             "minLength": 0
           },
           "username": {
             "type": "string",
-            "example": "GJLUVTLHRHb9jsuz6HAPbdYbI48O13R4KI5kkOkhbVKEuC3T2PRia112l3JsVAUHb6CmAg6HClxjKkdlkaZzKMeSxTnCkhlzcpDWfguA7CerTYC8syE9JDzKEQ31t",
+            "example": "j9xIQhORKHzHtgYusBRNOWFUdhbiN8yHeoB22JUqeK4l3vlHw2fylYDETs13rC4Tmoibgu3LHkLhwS3UhG4VkkK2vfZ2U8JrqlJvSOA1g6woQ51Yz2ShU1AH7mUW7",
             "maxLength": 255,
             "minLength": 0
           },
@@ -785,13 +785,13 @@
         "properties": {
           "userId": {
             "type": "string",
-            "example": "rfSfmwQYmO85Ij9BHWIuotTJ2IqRDZaNhc137O4IOlY74E0cssC3UKfnpLFmNVnjDP4EGyFRACKsLi2pAfZFpKIoe5P9yihsQRpkvVFI09b4ElIXmvxCQZ4HuPHjm",
+            "example": "j1rFCvexZcuvzkIiwg85ArLtkYf07VBGlqa1mOjbnkBhk2k4TAjSvpsifBjaa7DmdHPshMghQzvxA1bnWLi3Y9RWpg4FYEffVsHs3cxaEaBGK0Uzx3xQrSWjEOD3i",
             "maxLength": 255,
             "minLength": 0
           },
           "connectionId": {
             "type": "string",
-            "example": "9s9cLJMur5trnb29AHB7MAJmTQw6DAcKdZ79l2QNADlBOjeeVPPq3Hua05YMRK9acvjit9n0dVzh3yAAj1Yh6Kz5doB9oOThX3OjQ76Z1YL1R2kOGid3ASs24IBmp",
+            "example": "3HmL1nuPSWVteyOBESwx96tBMH4okByfv1QPeTlCwHEIuO06eK5Q28dvXDS9hantTCsDTBJnJmudRdALme9iwUA45ymDU5kb4s2SqCzOu0Kxdb4FDlwtELIY76Ht2",
             "maxLength": 255,
             "minLength": 0
           }
@@ -806,7 +806,7 @@
         "properties": {
           "_id": {
             "type": "string",
-            "example": "fDXOtDGTZrKdwanjoB4LjHSF6FoMPZ2YgGvBDbuNNDYKzw4xQByeLKSEMdO60cruVBummI7n5ZLt5aR9BjC8tM0viUS9FilEjzz0fgjFDPOvU8skeD3nxmjUWUnJI",
+            "example": "NlBiUIUDwLUWbxezJN2RgVcuj4z7gDzz1UL0uTrox8N9R6E1VMmAx3xKgPNXrK6PhaT5RfaVXvW2M9Q2GWeDZaX1tWwVFeWpCyStD0WFynRhGlbJq47lyD1AYkjqf",
             "maxLength": 255,
             "minLength": 0
           },
@@ -822,7 +822,7 @@
           },
           "sub": {
             "type": "string",
-            "example": "Xm6rwEbzA3Xutbz4Giieyb9ay0HQpyXxLU6HJSfhhHCPs8b6G7u4RPOsHNZ54hn892QUi000v6lnK274xs6tX5InhmvPMkp8NQrQ2thuxpQYuQ78JuPxaWFEobk6r",
+            "example": "5q7YXab6kIi7vU1GsVAwneYVtkay6lN6ZtbQc5TXEs2Cg6RqKfIbI055vEgFuTZl3xjK4NkaJa6ugZciF4xjvlfrGSROi09qhPdbQVZFWLm6DV5zMRZoluTaTitZC",
             "maxLength": 255,
             "minLength": 0
           },
@@ -852,7 +852,7 @@
           },
           "phoneNumber": {
             "type": "string",
-            "example": "6CAJVoC7XNO9gVD43tOe3e8Bd5DZKmDPsazeJMHtRYt1TQuMWtZKXhYhwdXxyveDwp2lt4bT6ZdFEE5vTEWdmKsuVopIZnqHptLNQz7wAxzILLCLlQn2tZbac2mz8",
+            "example": "7O8Ahv0sLuYlx8duTMOla4XeyXUHZ3i0zTi4GnfhpsmjJ62rW6N3UjYi8jOi0OUEnzD1pZ2oOhF8g1fFboA51YfnDHFNoSX3DjwD9WAGHBnrwIgiMNfs09gTvYv52",
             "maxLength": 255,
             "minLength": 0
           },
@@ -893,7 +893,7 @@
         "properties": {
           "_id": {
             "type": "string",
-            "example": "fDXOtDGTZrKdwanjoB4LjHSF6FoMPZ2YgGvBDbuNNDYKzw4xQByeLKSEMdO60cruVBummI7n5ZLt5aR9BjC8tM0viUS9FilEjzz0fgjFDPOvU8skeD3nxmjUWUnJI",
+            "example": "NlBiUIUDwLUWbxezJN2RgVcuj4z7gDzz1UL0uTrox8N9R6E1VMmAx3xKgPNXrK6PhaT5RfaVXvW2M9Q2GWeDZaX1tWwVFeWpCyStD0WFynRhGlbJq47lyD1AYkjqf",
             "maxLength": 255,
             "minLength": 0
           },
@@ -909,13 +909,13 @@
           },
           "userId": {
             "type": "string",
-            "example": "1FstgK2pOotC8qhblnclobTXFKyt4pmepY6CftYoxLJ999CcW65iv3TiGOXV0hUeWtzJkPZhLAtiyR1mjC5knyRjvIaX5VPsgdEnsm4UrjoI69rjnMzB8Yfm0YjxG",
+            "example": "l3SCnbIPbLlwFHKXYgX0uLtnDlW9nxMk7rUoXhYk4tzcX3iBl8Os69i5XqLu75xbM53DnPJMkAMd5MJkYE2yh3dTk9qzrKEGldpMG3fD120GLXVqRWouxcb8LtVyy",
             "maxLength": 255,
             "minLength": 0
           },
           "connectionId": {
             "type": "string",
-            "example": "wnIQpZuDpGsEEfbc6WvgWMzRRLyraB19d6J0lmU25Mxsd8z6Jh2D2m0tRcJkJ4FTtPWMd5AkznLNLgfhd9pYcAYA6OSQrioNZJESG9akoH0jZYT0ADZx2Tm9RvaMV",
+            "example": "5yxdZ1rnfsyal7ZNDmqAgwYSbuuRhtlOcHuyQLHlPc0s467ApLn8TIsSkX9XJ7qgJMZP0gtfu82wq2ifD4OK57woFgjU7foLWAj3vVhahvEsH2wqc0p7jfG9j0FKq",
             "maxLength": 255,
             "minLength": 0
           }
@@ -931,7 +931,7 @@
         "properties": {
           "sub": {
             "type": "string",
-            "example": "AoNqLPt1l8088q3hqBedGgFBCdKyTJeR6skdG7Tbeh9ZLT6PtfhXmqYvdrga0hrD9urk5ubDqngchqGtC7c2FEgFW7OOLUjqPKycU2zJRZPgtYaZlOCgUx9WIJa45",
+            "example": "M05kMwOvdjXi3luA0eUFjOrRlYA1fkqSjPjPlvHW2wNkfNLqFH5zsI893yob1ZYHXKARy06g4ISy0ppxqJ8dMILnGLcNtug2w93uK4pxJWQTbFDMGqENBf902ZEiF",
             "maxLength": 255,
             "minLength": 0
           },
@@ -961,7 +961,7 @@
           },
           "phoneNumber": {
             "type": "string",
-            "example": "sh88slRqA2FDpJWeAmo68ukSEbnsqwKIqKpdldM86DWC7IqTkolE5EUw5rrXZsIx68mF9TCzB9RuU2rfz2ql56OKJWfvJRK0zZ9FZwMYa9nqy0yyKFNDYf5YReDRv",
+            "example": "RIduA1mnZXqj3SOv3K7dyysrgpOJGVFWN2VqeATGBCh2zzz71uLEkrs0r4eCDeZVf6rU4GBhT2D3zwt1ekYbbjmzrLWvscnTieJl2lQ6BBYHxUFvKCX87Tzui1xb9",
             "maxLength": 255,
             "minLength": 0
           },
@@ -992,7 +992,7 @@
         "properties": {
           "_id": {
             "type": "string",
-            "example": "fDXOtDGTZrKdwanjoB4LjHSF6FoMPZ2YgGvBDbuNNDYKzw4xQByeLKSEMdO60cruVBummI7n5ZLt5aR9BjC8tM0viUS9FilEjzz0fgjFDPOvU8skeD3nxmjUWUnJI",
+            "example": "NlBiUIUDwLUWbxezJN2RgVcuj4z7gDzz1UL0uTrox8N9R6E1VMmAx3xKgPNXrK6PhaT5RfaVXvW2M9Q2GWeDZaX1tWwVFeWpCyStD0WFynRhGlbJq47lyD1AYkjqf",
             "maxLength": 255,
             "minLength": 0
           },
@@ -1032,7 +1032,7 @@
           },
           "phoneNumber": {
             "type": "string",
-            "example": "vOTFHcOmQ9fuZhzfhcMPZYKxB8z6Wmws9zOkUW8aiAN6juDKMXI1PZCz8eAJAjejUwL9gMW5NUM6CSIPF8hQpTRAR3JiDqcsuBnNURxHTKk9zXgoBUg4hXCsO8f0k",
+            "example": "YN4iy8KXdp30C0ZiBboapMZBT1LXT6uOjgDkA1wjnn1lLYVvlfFncwQJuH82bdEultZktplsfWwY2TEyZ9Bcl6TG3PYpCmIZ5EUDd5mpVGcx2eibLJMYCll12nZJh",
             "maxLength": 255,
             "minLength": 0
           },

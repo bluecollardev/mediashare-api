@@ -3,15 +3,14 @@
 import axios from 'axios';
 import { testAndCloneShareItem } from '../test-components';
 import { defaultOptionsWithBearer } from './auth';
-import { CreateShareItemDto } from '@mediashare/media-svc/src/app/modules/share-item/dto/create-share-item.dto';
-import { ShareItemDto } from '@mediashare/media-svc/src/app/modules/share-item/dto/share-item.dto';
+import { CreateMediaShareItemDto, CreatePlaylistShareItemDto } from '@mediashare/media-svc/src/app/modules/share-item/dto/create-share-item.dto';
 
-export const createShareItem =
+export const createMediaShareItem =
   ({ baseUrl, token }) =>
   async (shareItem) => {
     const dto = {
       ...shareItem,
-    } as CreateShareItemDto;
+    } as CreateMediaShareItemDto;
 
     return axios.post(
       `${baseUrl}/share-items`,
@@ -19,6 +18,21 @@ export const createShareItem =
       defaultOptionsWithBearer(token)
     );
   };
+
+export const createPlaylistShareItem =
+  ({ baseUrl, token }) =>
+    async (shareItem) => {
+      const dto = {
+        ...shareItem,
+      } as CreatePlaylistShareItemDto;
+
+      return axios.post(
+        `${baseUrl}/share-items`,
+        dto,
+        defaultOptionsWithBearer(token)
+      );
+    };
+
 export const createAndValidateTestShareItem = async (
   createShareItemFn,
   shareItemData = {
@@ -29,7 +43,7 @@ export const createAndValidateTestShareItem = async (
     createShareItemFn(shareItemData)
       .then((res) => {
         expect(res.status).toEqual(201);
-        const shareItem: ShareItemDto = res.data;
+        const shareItem = res.data;
         testAndCloneShareItem(shareItem, shareItemData);
         resolve(shareItem);
       })
@@ -46,8 +60,8 @@ export const initializeTestShareItem =
   (baseUrl: string, token: string) =>
   async (
     testUserId: string,
-    testPlaylistId: string,
-    testMediaItemId: string
+    testPlaylistId?: string,
+    testMediaItemId?: string
   ) => {
     const testShareItemData = {
       key: 'test-key',
@@ -60,10 +74,18 @@ export const initializeTestShareItem =
       visibility: 'public',
     };
     // Create a corresponding shareItem in the database
-    const createShareItemFn = createShareItem({
-      baseUrl,
-      token,
-    });
+    let createShareItemFn
+    if (testMediaItemId) {
+      createShareItemFn = createMediaShareItem({
+        baseUrl,
+        token,
+      });
+    } else if (testPlaylistId) {
+      createShareItemFn = createPlaylistShareItem({
+        baseUrl,
+        token,
+      });
+    }
 
     let result;
     // eslint-disable-next-line no-useless-catch
