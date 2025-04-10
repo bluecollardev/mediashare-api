@@ -15,6 +15,7 @@
     "user-svc:serve": "PORT=3001 nx serve user-svc",
     "user-svc:serve:prod": "PORT=3001 nx serve user-svc --env production",
     "docker": "npm run docker:base && docker compose -f ./docker/docker-compose.yml up --build",
+    "docker:db": "docker compose -f ./docker/docker-compose.yml up --build db",
     "docker:base": "docker build -t mediashare-base -f ./docker/dockerfiles/base.dockerfile .",
     "docker:media-svc:development": "PORT=3000 nx serve media-svc --host=0.0.0.0 --configuration=development --skip-nx-cache",
     "docker:media-svc:production": "PORT=3000 nx serve media-svc --host=0.0.0.0 --configuration=production --skip-nx-cache",
