@@ -3,7 +3,10 @@
 import axios from 'axios';
 import { testAndCloneShareItem } from '../test-components';
 import { defaultOptionsWithBearer } from './auth';
-import { CreateMediaShareItemDto, CreatePlaylistShareItemDto } from '@mediashare/media-svc/src/app/modules/share-item/dto/create-share-item.dto';
+import {
+  CreateMediaShareItemDto,
+  CreatePlaylistShareItemDto,
+} from '@mediashare/media-svc/src/app/modules/share-item/dto/create-share-item.dto';
 
 export const createMediaShareItem =
   ({ baseUrl, token }) =>
@@ -21,17 +24,17 @@ export const createMediaShareItem =
 
 export const createPlaylistShareItem =
   ({ baseUrl, token }) =>
-    async (shareItem) => {
-      const dto = {
-        ...shareItem,
-      } as CreatePlaylistShareItemDto;
+  async (shareItem) => {
+    const dto = {
+      ...shareItem,
+    } as CreatePlaylistShareItemDto;
 
-      return axios.post(
-        `${baseUrl}/share-items`,
-        dto,
-        defaultOptionsWithBearer(token)
-      );
-    };
+    return axios.post(
+      `${baseUrl}/share-items`,
+      dto,
+      defaultOptionsWithBearer(token)
+    );
+  };
 
 export const createAndValidateTestShareItem = async (
   createShareItemFn,
@@ -74,7 +77,7 @@ export const initializeTestShareItem =
       visibility: 'public',
     };
     // Create a corresponding shareItem in the database
-    let createShareItemFn
+    let createShareItemFn;
     if (testMediaItemId) {
       createShareItemFn = createMediaShareItem({
         baseUrl,
