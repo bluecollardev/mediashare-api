@@ -229,7 +229,8 @@ export abstract class DataService<
           as: 'author',
         },
       },
-      { $unwind: { path: '$author' } },
+      // TODO: Fix this author inclusion!
+      /* { $unwind: { path: '$author' } },
       {
         $addFields: {
           authorProfile: {
@@ -241,7 +242,7 @@ export abstract class DataService<
             authorImage: '$author.imageSrc',
           },
         },
-      },
+      }, */
     ];
   }
 
