@@ -50,7 +50,6 @@ deploy-dev-user-svc:
   only:
     - feature/merge-and-complete-pipelines
     - develop
-  when: manual
 
 deploy-dev-media-svc:
   stage: deploy-dev
@@ -65,7 +64,6 @@ deploy-dev-media-svc:
   only:
     - feature/merge-and-complete-pipelines
     - develop
-  when: manual
 
 deploy-dev-tags-svc:
   stage: deploy-dev
@@ -80,7 +78,6 @@ deploy-dev-tags-svc:
   only:
     - feature/merge-and-complete-pipelines
     - develop
-  when: manual
 
 # Deploy to production environment
 deploy-prod-user-svc:
@@ -95,7 +92,6 @@ deploy-prod-user-svc:
     url: $PROD_USER_SVC_URL
   only:
     - master
-  when: manual
 
 deploy-prod-media-svc:
   stage: deploy-prod
@@ -109,7 +105,6 @@ deploy-prod-media-svc:
     url: $PROD_MEDIA_SVC_URL
   only:
     - master
-  when: manual
 
 deploy-prod-tags-svc:
   stage: deploy-prod
@@ -123,4 +118,3 @@ deploy-prod-tags-svc:
     url: $PROD_TAGS_SVC_URL
   only:
     - master
-  when: manual
