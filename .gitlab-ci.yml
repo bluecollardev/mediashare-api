@@ -4,11 +4,11 @@ stages:
   - deploy-prod
 
 variables:
-  NODE_VERSION: "20"
+  NODE_VERSION: '20'
 
 # Cache node_modules for faster builds
 cache:
-  key: "$CI_COMMIT_REF_SLUG"
+  key: '$CI_COMMIT_REF_SLUG'
   paths:
     - node_modules/
     - .nx/cache/
@@ -32,8 +32,8 @@ build:
       - dist/
     expire_in: 1 hour
   only:
+    -feature/merge-and-complete-pipelines
     - develop
-    - main
     - master
 
 # Deploy to development environment
@@ -48,7 +48,7 @@ deploy-dev-user-svc:
     name: development/user-svc
     url: $DEV_USER_SVC_URL
   only:
-    - develop
+    -feature/merge-and-complete-pipelines
   when: manual
 
 deploy-dev-media-svc:
@@ -62,7 +62,7 @@ deploy-dev-media-svc:
     name: development/media-svc
     url: $DEV_MEDIA_SVC_URL
   only:
-    - develop
+    -feature/merge-and-complete-pipelines
   when: manual
 
 deploy-dev-tags-svc:
@@ -76,7 +76,7 @@ deploy-dev-tags-svc:
     name: development/tags-svc
     url: $DEV_TAGS_SVC_URL
   only:
-    - develop
+    -feature/merge-and-complete-pipelines
   when: manual
 
 # Deploy to production environment
@@ -91,7 +91,7 @@ deploy-prod-user-svc:
     name: production/user-svc
     url: $PROD_USER_SVC_URL
   only:
-    - main
+    - develop
     - master
   when: manual
 
@@ -106,7 +106,7 @@ deploy-prod-media-svc:
     name: production/media-svc
     url: $PROD_MEDIA_SVC_URL
   only:
-    - main
+    - develop
     - master
   when: manual
 
@@ -121,6 +121,6 @@ deploy-prod-tags-svc:
     name: production/tags-svc
     url: $PROD_TAGS_SVC_URL
   only:
-    - main
+    - develop
     - master
   when: manual
