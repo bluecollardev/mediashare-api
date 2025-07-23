@@ -44,7 +44,7 @@ deploy-dev-user-svc:
   script:
     - echo "Deploying user-svc to development environment"
     - cd apps/user-svc && cp ../../vercel-user-svc.json vercel.json
-    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
   environment:
     name: development/user-svc
     url: $DEV_USER_SVC_URL
@@ -59,7 +59,7 @@ deploy-dev-media-svc:
   script:
     - echo "Deploying media-svc to development environment"
     - cd apps/media-svc && cp ../../vercel-media-svc.json vercel.json
-    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
   environment:
     name: development/media-svc
     url: $DEV_MEDIA_SVC_URL
@@ -74,7 +74,7 @@ deploy-dev-tags-svc:
   script:
     - echo "Deploying tags-svc to development environment"
     - cd apps/tags-svc && cp ../../vercel-tags-svc.json vercel.json
-    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
   environment:
     name: development/tags-svc
     url: $DEV_TAGS_SVC_URL
@@ -90,7 +90,7 @@ deploy-prod-user-svc:
   script:
     - echo "Deploying user-svc to production environment"
     - cd apps/user-svc && cp ../../vercel-user-svc.json vercel.json
-    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
   environment:
     name: production/user-svc
     url: $PROD_USER_SVC_URL
@@ -104,7 +104,7 @@ deploy-prod-media-svc:
   script:
     - echo "Deploying media-svc to production environment"
     - cd apps/media-svc && cp ../../vercel-media-svc.json vercel.json
-    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
   environment:
     name: production/media-svc
     url: $PROD_MEDIA_SVC_URL
@@ -118,7 +118,7 @@ deploy-prod-tags-svc:
   script:
     - echo "Deploying tags-svc to production environment"
     - cd apps/tags-svc && cp ../../vercel-tags-svc.json vercel.json
-    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
   environment:
     name: production/tags-svc
     url: $PROD_TAGS_SVC_URL
