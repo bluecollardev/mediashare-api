@@ -1,0 +1,126 @@
+stages:
+  - build
+  - deploy-dev
+  - deploy-prod
+
+variables:
+  NODE_VERSION: "20"
+
+# Cache node_modules for faster builds
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - node_modules/
+    - .nx/cache/
+
+before_script:
+  - apt-get update -qq && apt-get install -y -qq git curl
+  - curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
+  - apt-get install -y nodejs
+  - npm install -g vercel
+  - npm ci
+
+# Build all applications
+build:
+  stage: build
+  script:
+    - npm run build user-svc
+    - npm run build media-svc
+    - npm run build tags-svc
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour
+  only:
+    - develop
+    - main
+    - master
+
+# Deploy to development environment
+deploy-dev-user-svc:
+  stage: deploy-dev
+  dependencies:
+    - build
+  script:
+    - echo "Deploying user-svc to development environment"
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm --project-settings ./vercel-user-svc.json
+  environment:
+    name: development/user-svc
+    url: $DEV_USER_SVC_URL
+  only:
+    - develop
+  when: manual
+
+deploy-dev-media-svc:
+  stage: deploy-dev
+  dependencies:
+    - build
+  script:
+    - echo "Deploying media-svc to development environment"
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm --project-settings ./vercel-media-svc.json
+  environment:
+    name: development/media-svc
+    url: $DEV_MEDIA_SVC_URL
+  only:
+    - develop
+  when: manual
+
+deploy-dev-tags-svc:
+  stage: deploy-dev
+  dependencies:
+    - build
+  script:
+    - echo "Deploying tags-svc to development environment"
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm --project-settings ./vercel-tags-svc.json
+  environment:
+    name: development/tags-svc
+    url: $DEV_TAGS_SVC_URL
+  only:
+    - develop
+  when: manual
+
+# Deploy to production environment
+deploy-prod-user-svc:
+  stage: deploy-prod
+  dependencies:
+    - build
+  script:
+    - echo "Deploying user-svc to production environment"
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm --project-settings ./vercel-user-svc.json
+  environment:
+    name: production/user-svc
+    url: $PROD_USER_SVC_URL
+  only:
+    - main
+    - master
+  when: manual
+
+deploy-prod-media-svc:
+  stage: deploy-prod
+  dependencies:
+    - build
+  script:
+    - echo "Deploying media-svc to production environment"
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm --project-settings ./vercel-media-svc.json
+  environment:
+    name: production/media-svc
+    url: $PROD_MEDIA_SVC_URL
+  only:
+    - main
+    - master
+  when: manual
+
+deploy-prod-tags-svc:
+  stage: deploy-prod
+  dependencies:
+    - build
+  script:
+    - echo "Deploying tags-svc to production environment"
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --confirm --project-settings ./vercel-tags-svc.json
+  environment:
+    name: production/tags-svc
+    url: $PROD_TAGS_SVC_URL
+  only:
+    - main
+    - master
+  when: manual

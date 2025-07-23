@@ -1,0 +1,27 @@
+{
+  "name": "mediashare-user-svc",
+  "buildCommand": "npm run build user-svc",
+  "outputDirectory": "dist/apps/user-svc",
+  "installCommand": "npm ci",
+  "framework": null,
+  "functions": {
+    "dist/apps/user-svc/main.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/dist/apps/user-svc/main.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3001"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}

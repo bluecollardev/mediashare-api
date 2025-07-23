@@ -1,0 +1,27 @@
+{
+  "name": "mediashare-tags-svc",
+  "buildCommand": "npm run build tags-svc",
+  "outputDirectory": "dist/apps/tags-svc",
+  "installCommand": "npm ci",
+  "framework": null,
+  "functions": {
+    "dist/apps/tags-svc/main.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/dist/apps/tags-svc/main.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3002"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}

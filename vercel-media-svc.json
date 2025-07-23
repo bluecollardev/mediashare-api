@@ -1,0 +1,27 @@
+{
+  "name": "mediashare-media-svc",
+  "buildCommand": "npm run build media-svc",
+  "outputDirectory": "dist/apps/media-svc",
+  "installCommand": "npm ci",
+  "framework": null,
+  "functions": {
+    "dist/apps/media-svc/main.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/dist/apps/media-svc/main.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}
