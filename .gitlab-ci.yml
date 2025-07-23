@@ -32,7 +32,7 @@ build:
       - dist/
     expire_in: 1 hour
   only:
-    -feature/merge-and-complete-pipelines
+    - feature/merge-and-complete-pipelines
     - develop
     - master
 
@@ -47,8 +47,7 @@ deploy-dev-user-svc:
   environment:
     name: development/user-svc
     url: $DEV_USER_SVC_URL
-  only:
-    -feature/merge-and-complete-pipelines
+  only: -feature/merge-and-complete-pipelines
   when: manual
 
 deploy-dev-media-svc:
@@ -61,8 +60,7 @@ deploy-dev-media-svc:
   environment:
     name: development/media-svc
     url: $DEV_MEDIA_SVC_URL
-  only:
-    -feature/merge-and-complete-pipelines
+  only: -feature/merge-and-complete-pipelines
   when: manual
 
 deploy-dev-tags-svc:
@@ -75,8 +73,7 @@ deploy-dev-tags-svc:
   environment:
     name: development/tags-svc
     url: $DEV_TAGS_SVC_URL
-  only:
-    -feature/merge-and-complete-pipelines
+  only: -feature/merge-and-complete-pipelines
   when: manual
 
 # Deploy to production environment
