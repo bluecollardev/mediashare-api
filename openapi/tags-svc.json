@@ -17,7 +17,18 @@
         "operationId": "CognitoTestingController_login",
         "parameters": [],
         "responses": {
-          "201": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/config": {
+      "post": {
+        "operationId": "CognitoTestingController_setMockConfig",
+        "parameters": [],
+        "responses": {
+          "200": {
             "description": ""
           }
         }
@@ -49,7 +60,9 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -74,7 +87,9 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -118,7 +133,9 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -143,7 +160,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -175,7 +194,9 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -224,7 +245,7 @@
         "properties": {
           "_id": {
             "type": "string",
-            "example": "ze1tccp9mdPdo3721bJlNLyy0vdpfK6DVFYrv6blfQB4MEbgBkqG4jIEIU5KagEVcJcuyCRCRvehG2aKdos7fRtLQ5u9qNcIUt99soaCqDXcClSPgckJkLHeY61xT",
+            "example": "8NXjw2OIR5T8uuwg1z4PRhgsSTClMrH7t8ZzMYB3JkRTIdauYwAP4dPwKg91PmKzm8cJrcnjXPoB9fk3g4Pm5LBeQomOLqc1pZfwcbmq1nfKVzanhHblslEQM5ShB",
             "maxLength": 255,
             "minLength": 0
           },
@@ -272,7 +293,7 @@
         "properties": {
           "_id": {
             "type": "string",
-            "example": "ze1tccp9mdPdo3721bJlNLyy0vdpfK6DVFYrv6blfQB4MEbgBkqG4jIEIU5KagEVcJcuyCRCRvehG2aKdos7fRtLQ5u9qNcIUt99soaCqDXcClSPgckJkLHeY61xT",
+            "example": "8NXjw2OIR5T8uuwg1z4PRhgsSTClMrH7t8ZzMYB3JkRTIdauYwAP4dPwKg91PmKzm8cJrcnjXPoB9fk3g4Pm5LBeQomOLqc1pZfwcbmq1nfKVzanhHblslEQM5ShB",
             "maxLength": 255,
             "minLength": 0
           },
@@ -295,7 +316,10 @@
             ]
           }
         },
-        "required": ["_id", "tags"]
+        "required": [
+          "_id",
+          "tags"
+        ]
       },
       "UpdateTagDto": {
         "type": "object",
@@ -310,13 +334,13 @@
         "properties": {
           "key": {
             "type": "string",
-            "example": "32kyZoGIclITZIcT8ZoiyooIkSoNWKiOsoeuiDw8dxtU2ByTTDMbsKIWiJDxAhFRfdnAtfhPAgcbQ6OUXjM7Msu8Haq5lMUeUsl6ciHaX2U0Imfa0gTkQtxFYXLAs",
+            "example": "JTw1OeFLzlWnqtn4AJVHPtRFLE2z1iC6zmJPfrAplGePhcAjh5wfuThDL91h3bkjzIk40PGlmWuftkYAFo4TxX1CpzDTxEoWgxCh7BTezTgz1lPYWSsHqBDWXmpDq",
             "maxLength": 255,
             "minLength": 0
           },
           "value": {
             "type": "string",
-            "example": "fepPEUTbKoRMCEZehGdmOtFdPBHeCjn0Sy76XZkcuUCTZ12R9Bo9cKjoNjAyGUE9TBwGfbztsTu9DxGni9uekcKoIRJNLV5iUoJMhneMYXTqOKIvi52VP61kAAoEc",
+            "example": "YjhOVg4Glf0933t7Nsjp7pDZ5RWg1tqnkp2WPTha0stPcyTeOhDHvctdxWt56VyiZTLKShvdY1W89Bl80Qn1gDLHCWPY0CIHgqnY8XzWnDWVRL5Fvu6PR3mHMQLQE",
             "maxLength": 255,
             "minLength": 0
           },
