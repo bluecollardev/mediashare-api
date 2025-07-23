@@ -1,14 +1,15 @@
 {
   "name": "mediashare-user-svc",
-  "buildCommand": "npm run build user-svc",
-  "outputDirectory": "dist/apps/user-svc",
-  "installCommand": "npm ci",
-  "framework": null,
-  "functions": {
-    "dist/apps/user-svc/main.js": {
-      "runtime": "nodejs20.x@1.0.0"
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/apps/user-svc/main.js",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
     }
-  },
+  ],
   "routes": [
     {
       "src": "/(.*)",
@@ -18,10 +19,5 @@
   "env": {
     "NODE_ENV": "production",
     "PORT": "3001"
-  },
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
-    }
   }
 }

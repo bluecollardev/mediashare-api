@@ -1,14 +1,15 @@
 {
   "name": "mediashare-media-svc",
-  "buildCommand": "npm run build media-svc",
-  "outputDirectory": "dist/apps/media-svc",
-  "installCommand": "npm ci",
-  "framework": null,
-  "functions": {
-    "dist/apps/media-svc/main.js": {
-      "runtime": "nodejs20.x@1.0.0"
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/apps/media-svc/main.js",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
     }
-  },
+  ],
   "routes": [
     {
       "src": "/(.*)",
@@ -18,10 +19,5 @@
   "env": {
     "NODE_ENV": "production",
     "PORT": "3000"
-  },
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
-    }
   }
 }
