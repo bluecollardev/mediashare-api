@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "license": "MIT",
   "engines": {
-    "node": "16.x"
+    "node": "20.x"
   },
   "scripts": {
     "install:tools:mongocli": "brew install mongocli",
@@ -18,13 +18,16 @@
     "tags-svc:serve": "PORT=3002 nx serve tags-svc",
     "tags-svc:serve:prod": "PORT=3002 nx serve tags-svc --env production",
     "docker": "npm run docker:base && docker compose -f ./docker/docker-compose.yml up --build",
-    "docker:db": "docker compose -f ./docker/docker-compose.yml up --build db",
+    "docker:db": "docker compose -f ./docker/docker-compose.yml up --build -d db && npm run db:restore",
     "docker:base": "docker build -t mediashare-base -f ./docker/dockerfiles/base.dockerfile .",
     "docker:media-svc:development": "PORT=3000 nx serve media-svc --host=0.0.0.0 --configuration=development --skip-nx-cache",
     "docker:media-svc:production": "PORT=3000 nx serve media-svc --host=0.0.0.0 --configuration=production --skip-nx-cache",
     "docker:user-svc:development": "PORT=3001 nx serve user-svc --host=0.0.0.0 --configuration=development --skip-nx-cache",
     "docker:user-svc:production": "PORT=3001 nx serve user-svc --host=0.0.0.0 --configuration=production --skip-nx-cache",
-    "db:backup": "timestamp=$(date \"+%Y%m%d-%H%M%S\") && mongodump -d mediashare --gzip --archive=./data/mediashare-backup.$timestamp.tar.gz",
+    "db:backup:latest": "timestamp=$(date \"+%Y%m%d-%H%M%S\") && mongodump -d mediashare --gzip --archive=./data/mediashare-backup.tar.gz",
+    "db:backup:now": "timestamp=$(date \"+%Y%m%d-%H%M%S\") && mongodump -d mediashare --gzip --archive=./data/mediashare-backup.$timestamp.tar.gz",
+    "db:backup": "npm run db:backup:latest && npm run db:backup:now",
+    "db:restore": "mongorestore --gzip --archive=./data/mediashare-backup.tar.gz --drop",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:watch": "jest --watch",
