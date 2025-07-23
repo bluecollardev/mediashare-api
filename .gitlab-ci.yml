@@ -24,9 +24,9 @@ before_script:
 build:
   stage: build
   script:
-    - npm run build user-svc
-    - npm run build media-svc
-    - npm run build tags-svc
+    - nx run user-svc:build
+    - nx run media-svc:build
+    - nx run tags-svc:build
   artifacts:
     paths:
       - dist/
