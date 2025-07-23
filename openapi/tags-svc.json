@@ -60,9 +60,7 @@
             }
           }
         },
-        "tags": [
-          "tags"
-        ],
+        "tags": ["tags"],
         "security": [
           {
             "bearer": []
@@ -87,9 +85,7 @@
             }
           }
         },
-        "tags": [
-          "tags"
-        ],
+        "tags": ["tags"],
         "security": [
           {
             "bearer": []
@@ -133,9 +129,7 @@
             }
           }
         },
-        "tags": [
-          "tags"
-        ],
+        "tags": ["tags"],
         "security": [
           {
             "bearer": []
@@ -160,9 +154,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "tags"
-        ],
+        "tags": ["tags"],
         "security": [
           {
             "bearer": []
@@ -194,9 +186,7 @@
             }
           }
         },
-        "tags": [
-          "tags"
-        ],
+        "tags": ["tags"],
         "security": [
           {
             "bearer": []
@@ -316,10 +306,7 @@
             ]
           }
         },
-        "required": [
-          "_id",
-          "tags"
-        ]
+        "required": ["_id", "tags"]
       },
       "UpdateTagDto": {
         "type": "object",
