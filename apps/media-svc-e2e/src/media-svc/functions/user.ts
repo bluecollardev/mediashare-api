@@ -75,7 +75,10 @@ export const initializeTestUser = async (
       baseUrl: userApiBaseUrl,
       token: authResponse?.IdToken,
     });
-    const testUser = await createAndValidateTestUser(createUserFn, testUserData);
+    const testUser = await createAndValidateTestUser(
+      createUserFn,
+      testUserData
+    );
     return [testUser, authResponse as AuthenticationResultType];
   } catch (err) {
     throw err;
