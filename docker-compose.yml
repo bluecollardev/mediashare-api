@@ -1,0 +1,114 @@
+version: '3.9'
+services:
+  #  proxy:
+  #    profiles: [ "proxy", "named-host", "all" ]
+  #    image: nginxproxy/nginx-proxy
+  #    ports:
+  #      - "80:80"
+  #      - "443:443"
+  #    volumes:
+  #      - /var/run/docker.sock:/tmp/docker.sock:ro
+  #      - ../certs:/etc/nginx/certs
+  #    environment:
+  #      - TRUST_DOWNSTREAM_PROXY=false
+  #    networks:
+  #      - mediashare-network
+  user-svc:
+    build:
+      context: ..
+      dockerfile: ./docker/dockerfiles/app.dockerfile
+      args:
+        project: user-svc
+        environment: development
+    links:
+      - db
+    depends_on:
+      - db
+    ports:
+      - '3001:3001'
+    expose:
+      - 3001
+    networks:
+      - mediashare-network
+    environment:
+      #      - VIRTUAL_HOST=demo
+      #      - VIRTUAL_PORT=3000
+      #      - VIRTUAL_PROTO=https
+      - NODE_ENV=production
+      - APP_NAME=UserSvc
+      - APP_HOST=0.0.0.0
+      - PORT=3001
+      - APP_PREFIX=
+      - APP_TITLE=UserSvc
+      - DB_HOST=db
+      - DB_URL=mongodb://db:27017/
+      - SESSION_DB_NAME=api-session
+      - SESSION_SECRET=this-is-my-secret-key
+      - SESSION_DB_COLLECTION=session
+      - DB_TYPE=mongodb
+      - DB_IS_ATLAS=true
+      - DB=mediashare
+      - DB_SSL=false
+      - DB_SYNCHRONIZE=true
+      - DB_USERNAME=mongodb
+  #    labels:
+  #      - com.datadoghq.tags.service="user-svc"
+  #      - com.datadoghq.tags.env="staging"
+  #      - com.datadoghq.tags.version="0.0.1"
+  media-svc:
+    build:
+      context: ..
+      dockerfile: ./docker/dockerfiles/app.dockerfile
+      args:
+        project: media-svc
+        environment: development
+    links:
+      - db
+    depends_on:
+      - db
+    ports:
+      - '3000:3000'
+    expose:
+      - 3000
+    networks:
+      - mediashare-network
+    environment:
+      #      - VIRTUAL_HOST=demo
+      #      - VIRTUAL_PORT=3000
+      #      - VIRTUAL_PROTO=https
+      - NODE_ENV=production
+      - APP_NAME=MediaSvc
+      - APP_HOST=0.0.0.0
+      - PORT=3000
+      - APP_PREFIX=
+      - APP_TITLE=MediaSvc
+      - DB_HOST=db
+      - DB_URL=mongodb://db:27017/
+      - SESSION_DB_NAME=api-session
+      - SESSION_SECRET=this-is-my-secret-key
+      - SESSION_DB_COLLECTION=session
+      - DB_TYPE=mongodb
+      - DB_IS_ATLAS=true
+      - DB=mediashare
+      - DB_SSL=false
+      - DB_SYNCHRONIZE=true
+      - DB_USERNAME=mongodb
+  #    labels:
+  #      - com.datadoghq.tags.service="media-svc"
+  #      - com.datadoghq.tags.env="staging"
+  #      - com.datadoghq.tags.version="0.0.1"
+  db:
+    image: mongo:4.0.4
+    container_name: db
+    volumes:
+      - ms-mongo-data:/var/lib/mongodb/data
+    ports:
+      - '27017:27017'
+    networks:
+      - mediashare-network
+    environment:
+      - MONGODB_DATABASE='mediashare'
+volumes:
+  ms-mongo-data:
+networks:
+  mediashare-network:
