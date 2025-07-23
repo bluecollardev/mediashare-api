@@ -47,7 +47,9 @@ deploy-dev-user-svc:
   environment:
     name: development/user-svc
     url: $DEV_USER_SVC_URL
-  only: -feature/merge-and-complete-pipelines
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
   when: manual
 
 deploy-dev-media-svc:
@@ -60,7 +62,9 @@ deploy-dev-media-svc:
   environment:
     name: development/media-svc
     url: $DEV_MEDIA_SVC_URL
-  only: -feature/merge-and-complete-pipelines
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
   when: manual
 
 deploy-dev-tags-svc:
@@ -73,7 +77,9 @@ deploy-dev-tags-svc:
   environment:
     name: development/tags-svc
     url: $DEV_TAGS_SVC_URL
-  only: -feature/merge-and-complete-pipelines
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
   when: manual
 
 # Deploy to production environment
@@ -88,7 +94,6 @@ deploy-prod-user-svc:
     name: production/user-svc
     url: $PROD_USER_SVC_URL
   only:
-    - develop
     - master
   when: manual
 
@@ -103,7 +108,6 @@ deploy-prod-media-svc:
     name: production/media-svc
     url: $PROD_MEDIA_SVC_URL
   only:
-    - develop
     - master
   when: manual
 
@@ -118,6 +122,5 @@ deploy-prod-tags-svc:
     name: production/tags-svc
     url: $PROD_TAGS_SVC_URL
   only:
-    - develop
     - master
   when: manual
