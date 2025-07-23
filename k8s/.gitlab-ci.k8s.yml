@@ -2,14 +2,14 @@ default:
   image: node:16
 
 stages:
-  - dev-build-affected
+  #  - dev-build-affected
   - dev-build-all
-  - dev-triggers-affected
+  #  - dev-triggers-affected
   - dev-triggers-all
   - dev-deploy
-  - prod-build-affected
+  #  - prod-build-affected
   - prod-build-all
-  - prod-triggers-affected
+  #  - prod-triggers-affected
   - prod-triggers-all
   - prod-deploy
 
@@ -23,19 +23,19 @@ variables:
   IMAGE_TAG: '$CI_COMMIT_SHORT_SHA'
   GITLAB_TOKEN: '$GITLAB_TOKEN'
 
-dev-build-affected:
-  stage: dev-build-affected
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
-  script:
-    - npm ci --force
-    - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --affected --base=HEAD~1 --json)" dev
-    - cat dynamic-gitlab-ci.yml
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - dist/
-      - dynamic-gitlab-ci.yml
+#dev-build-affected:
+#  stage: dev-build-affected
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
+#  script:
+#    - npm ci --force
+#    - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --affected --base=HEAD~1 --json)" dev
+#    - cat dynamic-gitlab-ci.yml
+#  artifacts:
+#    expire_in: 1 week
+#    paths:
+#      - dist/
+#      - dynamic-gitlab-ci.yml
 
 dev-build-all:
   stage: dev-build-all
@@ -52,17 +52,17 @@ dev-build-all:
       - dist/
       - dynamic-gitlab-ci.yml
 
-dev-triggers-affected:
-  stage: dev-triggers-affected
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
-  needs:
-    - dev-build-affected
-  trigger:
-    include:
-      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
-        job: dev-build-affected
-    strategy: depend
+#dev-triggers-affected:
+#  stage: dev-triggers-affected
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
+#  needs:
+#    - dev-build-affected
+#  trigger:
+#    include:
+#      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
+#        job: dev-build-affected
+#    strategy: depend
 
 dev-triggers-all:
   stage: dev-triggers-all
@@ -82,8 +82,8 @@ dev-deploy:
     - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH != "k8s"
   when: manual
   needs:
-    - job: dev-triggers-affected
-      optional: true
+    #    - job: dev-triggers-affected
+    #      optional: true
     - job: dev-triggers-all
       optional: true
   script:
@@ -102,19 +102,19 @@ dev-deploy:
     - git commit -m "Update image tags ${CI_COMMIT_SHORT_SHA}" && git log -v
     - git push origin HEAD:k8s
 
-prod-build-affected:
-  stage: prod-build-affected
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-  script:
-    - npm ci --force
-    - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --affected --base=HEAD~1 --json)"
-    - cat dynamic-gitlab-ci.yml
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - dist/
-      - dynamic-gitlab-ci.yml
+#prod-build-affected:
+#  stage: prod-build-affected
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == "master"
+#  script:
+#    - npm ci --force
+#    - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --affected --base=HEAD~1 --json)"
+#    - cat dynamic-gitlab-ci.yml
+#  artifacts:
+#    expire_in: 1 week
+#    paths:
+#      - dist/
+#      - dynamic-gitlab-ci.yml
 
 prod-build-all:
   stage: prod-build-all
@@ -131,17 +131,17 @@ prod-build-all:
       - dist/
       - dynamic-gitlab-ci.yml
 
-prod-triggers-affected:
-  stage: prod-triggers-affected
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-  needs:
-    - prod-build-affected
-  trigger:
-    include:
-      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
-        job: prod-build-affected
-    strategy: depend
+#prod-triggers-affected:
+#  stage: prod-triggers-affected
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == "master"
+#  needs:
+#    - prod-build-affected
+#  trigger:
+#    include:
+#      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
+#        job: prod-build-affected
+#    strategy: depend
 
 prod-triggers-all:
   stage: prod-triggers-all
@@ -161,8 +161,8 @@ prod-deploy:
     - if: $CI_COMMIT_BRANCH == "master"
   when: manual
   needs:
-    - job: prod-triggers-affected
-      optional: true
+    #    - job: prod-triggers-affected
+    #      optional: true
     - job: prod-triggers-all
       optional: true
   script:
