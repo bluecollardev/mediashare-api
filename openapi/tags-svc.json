@@ -60,7 +60,9 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -85,7 +87,9 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -129,7 +133,9 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -154,7 +160,9 @@
             "description": ""
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -186,7 +194,9 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -235,7 +245,7 @@
         "properties": {
           "_id": {
             "type": "string",
-            "example": "8NXjw2OIR5T8uuwg1z4PRhgsSTClMrH7t8ZzMYB3JkRTIdauYwAP4dPwKg91PmKzm8cJrcnjXPoB9fk3g4Pm5LBeQomOLqc1pZfwcbmq1nfKVzanhHblslEQM5ShB",
+            "example": "9G5RRwMCVfIyVPXOvKUqg6gSGpGk3bEWmtSECxdSZxTsBGHJBLklJ9RFZWHKi4lSbUeerc7JsIk9QJQ6uEoES5EYVNGlg3el960zd4d75NYYcr7hAVocl6aRiMYb0",
             "maxLength": 255,
             "minLength": 0
           },
@@ -283,7 +293,7 @@
         "properties": {
           "_id": {
             "type": "string",
-            "example": "8NXjw2OIR5T8uuwg1z4PRhgsSTClMrH7t8ZzMYB3JkRTIdauYwAP4dPwKg91PmKzm8cJrcnjXPoB9fk3g4Pm5LBeQomOLqc1pZfwcbmq1nfKVzanhHblslEQM5ShB",
+            "example": "9G5RRwMCVfIyVPXOvKUqg6gSGpGk3bEWmtSECxdSZxTsBGHJBLklJ9RFZWHKi4lSbUeerc7JsIk9QJQ6uEoES5EYVNGlg3el960zd4d75NYYcr7hAVocl6aRiMYb0",
             "maxLength": 255,
             "minLength": 0
           },
@@ -306,7 +316,10 @@
             ]
           }
         },
-        "required": ["_id", "tags"]
+        "required": [
+          "_id",
+          "tags"
+        ]
       },
       "UpdateTagDto": {
         "type": "object",
@@ -321,13 +334,13 @@
         "properties": {
           "key": {
             "type": "string",
-            "example": "JTw1OeFLzlWnqtn4AJVHPtRFLE2z1iC6zmJPfrAplGePhcAjh5wfuThDL91h3bkjzIk40PGlmWuftkYAFo4TxX1CpzDTxEoWgxCh7BTezTgz1lPYWSsHqBDWXmpDq",
+            "example": "83X6AjV5ee9wpTCnIfslS5oFc17gyumGu118FatIQNVNfzUmaUW3mKwmN8g3TI5q1BcG5kOuTm8moESku6pwA7hHF61IPgthhz5t0UZBEtrmzDar9tR6FEdNl0WMb",
             "maxLength": 255,
             "minLength": 0
           },
           "value": {
             "type": "string",
-            "example": "YjhOVg4Glf0933t7Nsjp7pDZ5RWg1tqnkp2WPTha0stPcyTeOhDHvctdxWt56VyiZTLKShvdY1W89Bl80Qn1gDLHCWPY0CIHgqnY8XzWnDWVRL5Fvu6PR3mHMQLQE",
+            "example": "l9bztIvuNh2NlJ1x0oYuYFWraa8Xy0JT7UwkgdZ8XEoHJnEr1thTJkJXoUVl0GBcPuS9IFqURVONoFHWiBuEYoAWaQAkM3ZqDzdCPmBVcoQRWmtwjjL2R79lkp0nb",
             "maxLength": 255,
             "minLength": 0
           },
