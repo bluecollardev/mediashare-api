@@ -48,3 +48,4 @@ openapi/clients/*
 
 # Gitlab
 dynamic-gitlab-ci.yml
+.vercel
