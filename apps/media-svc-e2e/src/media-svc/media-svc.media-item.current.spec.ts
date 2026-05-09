@@ -83,6 +83,7 @@ describe('MediaItemAPI.e2e', () => {
           expect(res.status).toEqual(200);
 
           const mediaItem: MediaItemDto = res.data;
+          expect(mediaItem).toBeTruthy();
           expect(mediaItem._id).toBeDefined();
           // TODO: This actually returns a profile object with authorId, author, authorImage and authorName
           // TODO: Dates aren't being returned, fix this!
@@ -141,7 +142,7 @@ describe('MediaItemAPI.e2e', () => {
               expect(res.status).toEqual(200);
 
               const mediaItem: MediaItemDto = res.data;
-              expect(mediaItem).toBeDefined();
+              expect(mediaItem).toBeTruthy();
               expect(mediaItem._id).toEqual(testMediaItemId);
               // TODO: Should ProfileDto return dates?
               // expect(mediaItem.createdAt).toEqual(testMediaItem.createdAt);

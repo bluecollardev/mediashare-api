@@ -1,5 +1,5 @@
 import { AutoMap } from '@automapper/classes';
-import { AutoMapOptions } from '@automapper/classes/lib/automap';
+import { AutoMapOptions } from '@automapper/classes';
 import { Entity, ObjectIdColumn, Column } from 'typeorm';
 import { ApiBaseEntity } from '@mediashare/core/entities/base.entity';
 import { ObjectId } from 'mongodb';

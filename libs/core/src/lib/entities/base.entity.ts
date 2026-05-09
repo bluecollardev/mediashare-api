@@ -1,5 +1,5 @@
 import { AutoMap } from '@automapper/classes';
-import { AutoMapOptions } from '@automapper/classes/lib/automap';
+import { AutoMapOptions } from '@automapper/classes';
 import {
   ObjectIdColumn,
   Entity,

@@ -6,7 +6,7 @@
     <working-dir value="$PROJECT_DIR$" />
     <envs>
       <env name="COGNITO_USER_EMAIL" value="lucas@bluecollardev.com" />
-      <env name="COGNITO_USER_PASSWORD" value="Staging123!" />
+      <env name="COGNITO_USER_PASSWORD" value="Testing123!" />
     </envs>
     <scope-kind value="SUITE" />
     <test-file value="$PROJECT_DIR$/apps/user-svc-e2e/src/user-svc/user-svc.connections.spec.ts" />

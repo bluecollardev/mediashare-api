@@ -1,0 +1,23 @@
+{
+  "name": "mediashare-tags-svc",
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/apps/tags-svc/main.js",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/dist/apps/tags-svc/main.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  }
+}

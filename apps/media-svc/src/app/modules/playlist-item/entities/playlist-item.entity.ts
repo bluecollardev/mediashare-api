@@ -1,5 +1,5 @@
 import { AutoMap } from '@automapper/classes';
-import { AutoMapOptions } from '@automapper/classes/lib/automap';
+import { AutoMapOptions } from '@automapper/classes';
 import { IsIn } from 'class-validator';
 import { Column, Entity, Index, ObjectIdColumn } from 'typeorm';
 import { ObjectId } from 'mongodb';

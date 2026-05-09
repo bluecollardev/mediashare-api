@@ -1,52 +1,147 @@
+.build-common-envs: &build-common-envs
+  - echo SAMPLE=$SAMPLE >> .env
+
 default:
-  image: node:16
+  image: docker:24.0.5
+  services:
+    - name: docker:24.0.5-dind
+      alias: dockerhost
+    # - name: mysql
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  after_script:
+    - docker logout
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://dockerhost:2375
+  # This instructs Docker not to start over TLS.
+  DOCKER_TLS_CERTDIR: ""
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+  NODE_VERSION: '20'
 
 stages:
   - build
-  - triggers
-  - deploy
+  - deploy-dev
+  - deploy-prod
 
-variables:
-  K8S_DEPLOYMENT_FILE_1: 'k8s/dev/user-svc/live/deployment.yaml'
-  K8S_DEPLOYMENT_FILE_2: 'k8s/dev/tags-svc/live/deployment.yaml'
-  K8S_DEPLOYMENT_FILE_3: 'k8s/dev/media-svc/live/deployment.yaml'
-  IMAGE_TAG: '$CI_COMMIT_SHORT_SHA'
-  GITLAB_TOKEN: '$GITLAB_TOKEN'
 
+# Cache node_modules for faster builds
+cache:
+  key: '$CI_COMMIT_REF_SLUG'
+  paths:
+    - node_modules/
+    - .nx/cache/
+
+before_script:
+  - apt-get update -qq && apt-get install -y -qq git curl
+  - curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
+  - apt-get install -y nodejs
+  - npm install -g vercel
+  - npm ci
+
+# Build all applications
 build:
   stage: build
   script:
-    - npm ci --force
-    - node ./index.js "$(npx nx print-affected --type=app --base=HEAD~1)"
-    - cat dynamic-gitlab-ci.yml
+    - npx nx run user-svc:build
+    - npx nx run media-svc:build
+    - npx nx run tags-svc:build
   artifacts:
-    expire_in: 1 week
     paths:
       - dist/
-      - dynamic-gitlab-ci.yml
+    expire_in: 1 hour
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
+    - master
 
-trigger:microservices:
-  stage: triggers
-  needs:
+# Deploy to development environment
+deploy-dev-user-svc:
+  stage: deploy-dev
+  dependencies:
     - build
-  trigger:
-    include:
-      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
-        job: build
-    strategy: depend
-
-deploy:
-  stage: deploy
   script:
-    - apk update && apk add git
-    - git config --global user.email "raghav@apptunix.com"
-    - git config --global user.name "raghav555"
-    - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
-    - cd temp_repo
-    - git checkout k8s
-    - sed -i "s/user-svc:.*/user-svc:${CI_COMMIT_SHORT_SHA}/g" $K8S_DEPLOYMENT_FILE_1
-    - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $K8S_DEPLOYMENT_FILE_2
-    - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $K8S_DEPLOYMENT_FILE_3
-    - git add .
-    - git commit -m "Update Kubernetes deployment with new images tags"
-    - git push origin HEAD:k8s
+    - echo "Deploying user-svc to development environment"
+    - cp vercel-user-svc.json vercel.json
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: development/user-svc
+    url: $DEV_USER_SVC_URL
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
+
+deploy-dev-media-svc:
+  stage: deploy-dev
+  dependencies:
+    - build
+  script:
+    - echo "Deploying media-svc to development environment"
+    - cp vercel-media-svc.json vercel.json
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: development/media-svc
+    url: $DEV_MEDIA_SVC_URL
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
+
+deploy-dev-tags-svc:
+  stage: deploy-dev
+  dependencies:
+    - build
+  script:
+    - echo "Deploying tags-svc to development environment"
+    - cp vercel-tags-svc.json vercel.json
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: development/tags-svc
+    url: $DEV_TAGS_SVC_URL
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
+
+# Deploy to production environment
+deploy-prod-user-svc:
+  stage: deploy-prod
+  dependencies:
+    - build
+  script:
+    - echo "Deploying user-svc to production environment"
+    - cp vercel-user-svc.json vercel.json
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: production/user-svc
+    url: $PROD_USER_SVC_URL
+  only:
+    - master
+
+deploy-prod-media-svc:
+  stage: deploy-prod
+  dependencies:
+    - build
+  script:
+    - echo "Deploying media-svc to production environment"
+    - cp vercel-media-svc.json vercel.json
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: production/media-svc
+    url: $PROD_MEDIA_SVC_URL
+  only:
+    - master
+
+deploy-prod-tags-svc:
+  stage: deploy-prod
+  dependencies:
+    - build
+  script:
+    - echo "Deploying tags-svc to production environment"
+    - cp vercel-tags-svc.json vercel.json
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: production/tags-svc
+    url: $PROD_TAGS_SVC_URL
+  only:
+    - master

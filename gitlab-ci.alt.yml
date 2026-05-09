@@ -1,0 +1,52 @@
+default:
+  image: node:16
+
+stages:
+  - build
+  - triggers
+  - deploy
+
+variables:
+  K8S_DEPLOYMENT_FILE_1: 'k8s/dev/user-svc/live/deployment.yaml'
+  K8S_DEPLOYMENT_FILE_2: 'k8s/dev/tags-svc/live/deployment.yaml'
+  K8S_DEPLOYMENT_FILE_3: 'k8s/dev/media-svc/live/deployment.yaml'
+  IMAGE_TAG: '$CI_COMMIT_SHORT_SHA'
+  GITLAB_TOKEN: '$GITLAB_TOKEN'
+
+build:
+  stage: build
+  script:
+    - npm ci --force
+    - node ./index.js "$(npx nx print-affected --type=app --base=HEAD~1)"
+    - cat dynamic-gitlab-ci.yml
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - dist/
+      - dynamic-gitlab-ci.yml
+
+trigger:microservices:
+  stage: triggers
+  needs:
+    - build
+  trigger:
+    include:
+      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
+        job: build
+    strategy: depend
+
+deploy:
+  stage: deploy
+  script:
+    - apk update && apk add git
+    - git config --global user.email "raghav@apptunix.com"
+    - git config --global user.name "raghav555"
+    - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
+    - cd temp_repo
+    - git checkout k8s
+    - sed -i "s/user-svc:.*/user-svc:${CI_COMMIT_SHORT_SHA}/g" $K8S_DEPLOYMENT_FILE_1
+    - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $K8S_DEPLOYMENT_FILE_2
+    - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $K8S_DEPLOYMENT_FILE_3
+    - git add .
+    - git commit -m "Update Kubernetes deployment with new images tags"
+    - git push origin HEAD:k8s

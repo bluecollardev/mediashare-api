@@ -99,6 +99,7 @@ describe('PlaylistItemAPI.e2e', () => {
           expect(res.status).toEqual(200);
 
           const playlistItem: PlaylistItemDto = res.data;
+          expect(playlistItem).toBeTruthy();
           expect(playlistItem._id).toBeDefined();
           // TODO: This actually returns a profile object with authorId, author, authorImage and authorName
           // TODO: Dates aren't being returned, fix this!

@@ -135,11 +135,11 @@ export const initializeApp = async (
         description: `local`,
       },
       {
-        url: `https://mediashare-api-staging.herokuapp.com`,
+        url: `https://user-api.dev.afehrpt.com`,
         description: `staging`,
       },
       {
-        url: `https://mediashare-api-prod.herokuapp.com`,
+        url: `https://user-api.afehrpt.com`,
         description: `production`,
       },
     ],
