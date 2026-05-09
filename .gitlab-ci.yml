@@ -12,10 +12,6 @@ variables:
   CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
   NODE_VERSION: '20'
 
-stages:
-  - build
-  - deploy-dev
-  - deploy-prod
 
 
 # Cache node_modules for faster builds
