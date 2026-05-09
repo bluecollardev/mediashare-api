@@ -52,12 +52,13 @@ export abstract class FilterableDataService<
     return false; // this.configService.get<string>('dbIsMongoAtlas');
   }
 
-  getById(id) {
+  async getById(id) {
     const pipeline = [
       { $match: { _id: ObjectIdGuard(id) } },
       ...this.buildFields(),
       this.replaceRoot(),
     ];
+    // const result = await this.repository.aggregate(pipeline).toArray()
     return this.repository.aggregate(pipeline).next();
   }
 

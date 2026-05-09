@@ -23,7 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { ParamTokens, RouteTokens } from '../../core/constants';
+import { ParamTokens, RouteTokens } from '@mediashare/core/constants';
 import { ShareItemService } from './share-item.service';
 import { MediaItemService } from '../media-item/media-item.service';
 import { PlaylistService } from '../playlist/playlist.service';

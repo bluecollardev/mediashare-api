@@ -7,6 +7,13 @@ export const testAndCloneMediaItem = (mediaItem, expected) => {
   return clone(mediaItem);
 };
 
+export const testAndCloneShareItem = (shareItem, expected) => {
+  expect(shareItem._id).toBeDefined();
+  expect(shareItem.createdAt).toBeDefined();
+  expect(shareItem.updatedDate).toBeDefined();
+  return clone(shareItem);
+};
+
 export const testAndClonePlaylistItem = (playlistItem, expected) => {
   expect(playlistItem._id).toBeDefined();
   expect(playlistItem.createdAt).toBeDefined();

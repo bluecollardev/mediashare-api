@@ -229,6 +229,7 @@ export abstract class DataService<
           as: 'author',
         },
       },
+      // TODO: Fix this author inclusion!
       { $unwind: { path: '$author' } },
       {
         $addFields: {

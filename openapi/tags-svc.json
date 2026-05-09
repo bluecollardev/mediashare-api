@@ -17,51 +17,39 @@
         "operationId": "CognitoTestingController_login",
         "parameters": [],
         "responses": {
-          "201": {
+          "200": {
             "description": ""
           }
         }
       }
     },
-    "/api/tags/{tagId}": {
-      "delete": {
-        "operationId": "TagController_remove",
-        "parameters": [
-          {
-            "name": "tagId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+    "/api/config": {
+      "post": {
+        "operationId": "CognitoTestingController_setMockConfig",
+        "parameters": [],
         "responses": {
           "200": {
             "description": ""
           }
-        },
-        "tags": ["tags"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "get": {
-        "operationId": "TagController_findOne",
-        "parameters": [
-          {
-            "name": "tagId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
+        }
+      }
+    },
+    "/api/tags": {
+      "post": {
+        "operationId": "TagController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
@@ -72,15 +60,15 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
           }
         ]
-      }
-    },
-    "/api/tags": {
+      },
       "get": {
         "operationId": "TagController_findAll",
         "parameters": [],
@@ -99,7 +87,116 @@
             }
           }
         },
-        "tags": ["tags"],
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/tags/{tagId}": {
+      "put": {
+        "operationId": "TagController_update",
+        "parameters": [
+          {
+            "name": "tagId",
+            "required": true,
+            "in": "path",
+            "example": "123",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tag"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "TagController_remove",
+        "parameters": [
+          {
+            "name": "tagId",
+            "required": true,
+            "in": "path",
+            "example": "123",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "TagController_findOne",
+        "parameters": [
+          {
+            "name": "tagId",
+            "required": true,
+            "in": "path",
+            "example": "123",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "tags"
+        ],
         "security": [
           {
             "bearer": []
@@ -126,11 +223,11 @@
       "description": "local"
     },
     {
-      "url": "https://mediashare-api-staging.herokuapp.com",
+      "url": "https://tags-api.dev.afehrpt.com",
       "description": "staging"
     },
     {
-      "url": "https://mediashare-api-prod.herokuapp.com",
+      "url": "https://tags-api.afehrpt.com",
       "description": "production"
     }
   ],
@@ -143,12 +240,60 @@
       }
     },
     "schemas": {
+      "CreateTagDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "KQxWz4hIPNh20n5N3isFxd2PE1vIKbFoxOfGJOEJiCKoNXb8KOejWiSTxSPe29H5hXOEcPgsS9ksaKJKP7Ga5tfzT2MWztU2PXIaIvkgXKlsrGebrxAnCCtUvLjNx",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "readOnly": true
+          },
+          "updatedDate": {
+            "format": "date-time",
+            "type": "string",
+            "readOnly": true
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "isMediaTag": {
+            "type": "boolean"
+          },
+          "isPlaylistTag": {
+            "type": "boolean"
+          },
+          "parentIds": {
+            "nullable": true,
+            "items": {
+              "type": "array"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "_id",
+          "key",
+          "value",
+          "isMediaTag",
+          "isPlaylistTag",
+          "parentIds"
+        ]
+      },
       "TagDto": {
         "type": "object",
         "properties": {
           "_id": {
             "type": "string",
-            "example": "Cjiw5p5vC1EIZzLBFWqkS5pu5UjGVkYBYVdlwrhBL159zPcqjndBOt8hotfWqMSmcQ4xZFYJXhZaCXUkxgMbs0txIsTYGiz6AQ7Q1quqKOdMfQDJBDuuQqzAW3bp5",
+            "example": "KQxWz4hIPNh20n5N3isFxd2PE1vIKbFoxOfGJOEJiCKoNXb8KOejWiSTxSPe29H5hXOEcPgsS9ksaKJKP7Ga5tfzT2MWztU2PXIaIvkgXKlsrGebrxAnCCtUvLjNx",
             "maxLength": 255,
             "minLength": 0
           },
@@ -171,7 +316,62 @@
             ]
           }
         },
-        "required": ["_id", "tags"]
+        "required": [
+          "_id",
+          "tags"
+        ]
+      },
+      "UpdateTagDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "ObjectId": {
+        "type": "object",
+        "properties": {}
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "YXAUj2l7sxvTiJxGFufvqs3F4PoLYxY5hL7HQvhUoMzUKedDzptTuEsdnWejLICUUuVaIcM7Whr0To1VZWpCzrEi6RaIzgG066Wj8IA0puUMUfjjtQ4nl46bliT0s",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "value": {
+            "type": "string",
+            "example": "oSdv9cFDM5XXClx2mP3Q6IMzkKkx448Q8ylIjBxdJVYRE24BwF30dvHmopP6kKNOAzk7RW3hFsydzTGoSaD1tlI6NoMjzf1zofpV8pbP568S6ZvNLPzgExjNAiyVn",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "imageSrc": {
+            "type": "string",
+            "nullable": true
+          },
+          "isMediaTag": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "isPlaylistTag": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "parentIds": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObjectId"
+            }
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "imageSrc",
+          "isMediaTag",
+          "isPlaylistTag",
+          "parentIds"
+        ]
       }
     }
   }

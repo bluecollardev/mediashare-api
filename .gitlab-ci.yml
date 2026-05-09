@@ -1,158 +1,126 @@
-default:
-  image: node:16
-
 stages:
-  - dev-build-affected
-  - dev-build-all
-  - dev-triggers-affected
-  - dev-triggers-all
-  - dev-deploy
-  - prod-build-affected
-  - prod-build-all
-  - prod-triggers-affected
-  - prod-triggers-all
-  - prod-deploy
+  - build
+  - deploy-dev
+  - deploy-prod
 
 variables:
-  DEV_K8S_DEPLOYMENT_FILE_1: 'k8s/dev/user-svc/dev/deployment.yaml'
-  DEV_K8S_DEPLOYMENT_FILE_2: 'k8s/dev/tags-svc/dev/deployment.yaml'
-  DEV_K8S_DEPLOYMENT_FILE_3: 'k8s/dev/media-svc/dev/deployment.yaml'
-  PROD_K8S_DEPLOYMENT_FILE_1: 'k8s/live/user-svc/dev/deployment.yaml'
-  PROD_K8S_DEPLOYMENT_FILE_2: 'k8s/live/tags-svc/dev/deployment.yaml'
-  PROD_K8S_DEPLOYMENT_FILE_3: 'k8s/live/media-svc/dev/deployment.yaml'
-  IMAGE_TAG: '$CI_COMMIT_SHORT_SHA'
-  GITLAB_TOKEN: '$GITLAB_TOKEN'
+  NODE_VERSION: '20'
 
-dev-build-affected:
-  stage: dev-build-affected
+# Cache node_modules for faster builds
+cache:
+  key: '$CI_COMMIT_REF_SLUG'
+  paths:
+    - node_modules/
+    - .nx/cache/
+
+before_script:
+  - apt-get update -qq && apt-get install -y -qq git curl
+  - curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
+  - apt-get install -y nodejs
+  - npm install -g vercel
+  - npm ci
+
+# Build all applications
+build:
+  stage: build
   script:
-    - npm ci --force
-    - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --affected --base=HEAD~1 --json)" dev
-    - cat dynamic-gitlab-ci.yml
+    - npx nx run user-svc:build
+    - npx nx run media-svc:build
+    - npx nx run tags-svc:build
   artifacts:
-    expire_in: 1 week
     paths:
       - dist/
-      - dynamic-gitlab-ci.yml
+    expire_in: 1 hour
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
+    - master
 
-dev-build-all:
-  stage: dev-build-all
-  when: manual
+# Deploy to development environment
+deploy-dev-user-svc:
+  stage: deploy-dev
+  dependencies:
+    - build
   script:
-    - npm ci --force
-    - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --json)" dev
-    - cat dynamic-gitlab-ci.yml
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - dist/
-      - dynamic-gitlab-ci.yml
+    - echo "Deploying user-svc to development environment"
+    - cp vercel-user-svc.json vercel.json
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: development/user-svc
+    url: $DEV_USER_SVC_URL
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
 
-dev-triggers-affected:
-  stage: dev-triggers-affected
-  needs:
-    - dev-build-affected
-  trigger:
-    include:
-      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
-        job: dev-build-affected
-    strategy: depend
-
-dev-triggers-all:
-  stage: dev-triggers-all
-  needs:
-    - dev-build-all
-  trigger:
-    include:
-      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
-        job: dev-build-all
-    strategy: depend
-
-dev-deploy:
-  stage: dev-deploy
-  when: manual
-  needs:
-    - job: dev-triggers-affected
-      optional: true
-    - job: dev-triggers-all
-      optional: true
+deploy-dev-media-svc:
+  stage: deploy-dev
+  dependencies:
+    - build
   script:
-    - apk update && apk add git
-    - git config --global user.email "lucaslopatka@gmail.com"
-    - git config --global user.name "Lucas Lopatka"
-    - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
-    - cd temp_repo
-    - git checkout k8s || git checkout develop && git -b checkout k8s
-    - sed -i "s/user-svc:.*/user-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_1
-    - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_2
-    - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_3
-    - git add .
-    - git commit -m "Update Kubernetes deployment services with new image tags"
-    - git push origin HEAD:k8s
+    - echo "Deploying media-svc to development environment"
+    - cp vercel-media-svc.json vercel.json
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: development/media-svc
+    url: $DEV_MEDIA_SVC_URL
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
 
-prod-build-affected:
-  stage: prod-build-affected
+deploy-dev-tags-svc:
+  stage: deploy-dev
+  dependencies:
+    - build
   script:
-    - npm ci --force
-    - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --affected --base=HEAD~1 --json)"
-    - cat dynamic-gitlab-ci.yml
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - dist/
-      - dynamic-gitlab-ci.yml
+    - echo "Deploying tags-svc to development environment"
+    - cp vercel-tags-svc.json vercel.json
+    - vercel --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: development/tags-svc
+    url: $DEV_TAGS_SVC_URL
+  only:
+    - feature/merge-and-complete-pipelines
+    - develop
 
-prod-build-all:
-  stage: prod-build-all
-  when: manual
+# Deploy to production environment
+deploy-prod-user-svc:
+  stage: deploy-prod
+  dependencies:
+    - build
   script:
-    - npm ci --force
-    - node ./dynamic-gitlab-ci.js "$(npx nx show projects --projects "apps/*" --exclude "*-e2e" --json)"
-    - cat dynamic-gitlab-ci.yml
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - dist/
-      - dynamic-gitlab-ci.yml
+    - echo "Deploying user-svc to production environment"
+    - cp vercel-user-svc.json vercel.json
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: production/user-svc
+    url: $PROD_USER_SVC_URL
+  only:
+    - master
 
-prod-triggers-affected:
-  stage: prod-triggers-affected
-  needs:
-    - prod-build-affected
-  trigger:
-    include:
-      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
-        job: prod-build-affected
-    strategy: depend
-
-prod-triggers-all:
-  stage: prod-triggers-all
-  needs:
-    - prod-build-all
-  trigger:
-    include:
-      - artifact: dynamic-gitlab-ci.yml # this file is generated on runtime in the build stage
-        job: prod-build-all
-    strategy: depend
-
-prod-deploy:
-  stage: prod-deploy
-  when: manual
-  needs:
-    - job: prod-triggers-affected
-      optional: true
-    - job: prod-triggers-all
-      optional: true
+deploy-prod-media-svc:
+  stage: deploy-prod
+  dependencies:
+    - build
   script:
-    - apk update && apk add git
-    - git config --global user.email "lucaslopatka@gmail.com"
-    - git config --global user.name "Lucas Lopatka"
-    - git clone "https://oauth2:$GITLAB_TOKEN@gitlab.com/technologycompany/mediashare.git" temp_repo
-    - cd temp_repo
-    - git checkout k8s || git checkout master && git -b checkout k8s
-    - sed -i "s/user-svc:.*/user-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_1
-    - sed -i "s/tags-svc:.*/tags-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_2
-    - sed -i "s/media-svc:.*/media-svc:${CI_COMMIT_SHORT_SHA}/g" $DEV_K8S_DEPLOYMENT_FILE_3
-    - git add .
-    - git commit -m "Update Kubernetes deployment services with new image tags"
-    - git push origin HEAD:k8s
+    - echo "Deploying media-svc to production environment"
+    - cp vercel-media-svc.json vercel.json
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: production/media-svc
+    url: $PROD_MEDIA_SVC_URL
+  only:
+    - master
+
+deploy-prod-tags-svc:
+  stage: deploy-prod
+  dependencies:
+    - build
+  script:
+    - echo "Deploying tags-svc to production environment"
+    - cp vercel-tags-svc.json vercel.json
+    - vercel --prod --token $VERCEL_TOKEN --scope $VERCEL_ORG_ID --yes
+  environment:
+    name: production/tags-svc
+    url: $PROD_TAGS_SVC_URL
+  only:
+    - master

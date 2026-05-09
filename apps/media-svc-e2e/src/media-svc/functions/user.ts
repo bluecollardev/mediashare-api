@@ -50,30 +50,37 @@ export const initializeTestUser = async (
   baseUrl: string,
   userApiBaseUrl: string
 ) => {
-  // Login first
-  const creds = buildTestCreds();
-  const authResponse: AuthenticationResultType = await login(baseUrl, creds);
-  console.log(`Logged in`, authResponse);
-  // const idToken = jwt.decode(authResponse?.IdToken);
-  const {
-    sub,
-    email,
-    phone_number: phoneNumber,
-  } = jwt.decode(authResponse?.IdToken) as any;
+  try {
+    // Login first
+    const creds = buildTestCreds();
+    const authResponse: AuthenticationResultType = await login(baseUrl, creds);
+    console.log(`Logged in`, authResponse);
+    // const idToken = jwt.decode(authResponse?.IdToken);
+    const {
+      sub,
+      email,
+      phone_number: phoneNumber,
+    } = jwt.decode(authResponse?.IdToken) as any;
 
-  const testUserData = {
-    sub,
-    email,
-    username: 'lucas@bluecollardev.com',
-    firstName: 'Lucas',
-    lastName: 'Lopatka',
-    phoneNumber,
-  };
-  // Create a corresponding user in the database
-  const createUserFn = createUser({
-    baseUrl: userApiBaseUrl,
-    token: authResponse?.IdToken,
-  });
-  const testUser = await createAndValidateTestUser(createUserFn, testUserData);
-  return [testUser, authResponse as AuthenticationResultType];
+    const testUserData = {
+      sub,
+      email,
+      username: 'lucas@bluecollardev.com',
+      firstName: 'Lucas',
+      lastName: 'Lopatka',
+      phoneNumber,
+    };
+    // Create a corresponding user in the database
+    const createUserFn = createUser({
+      baseUrl: userApiBaseUrl,
+      token: authResponse?.IdToken,
+    });
+    const testUser = await createAndValidateTestUser(
+      createUserFn,
+      testUserData
+    );
+    return [testUser, authResponse as AuthenticationResultType];
+  } catch (err) {
+    throw err;
+  }
 };

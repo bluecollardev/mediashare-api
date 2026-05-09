@@ -19,7 +19,7 @@ import {
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { MEDIA_VISIBILITY } from '../../core/models';
-import { ParamTokens, RouteTokens } from '../../core/constants';
+import { ParamTokens, RouteTokens } from '@mediashare/core/constants';
 import {
   MediaGetResponse,
   MediaPostResponse,
