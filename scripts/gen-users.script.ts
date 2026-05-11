@@ -295,16 +295,18 @@ async function reattribute(db: Db, adamSub: string) {
   // ---- 7. Legacy schema cleanup: media_item & playlist_item ------------
   // The legacy schema duplicated ownership across `userId` and (the inherited)
   // `createdBy`. The new schema has only `createdBy`. Migrate any rows still
-  // carrying `userId` by copying it to `createdBy` (when needed), then $unset
-  // `userId` entirely.
+  // carrying `userId` by copying it to `createdBy` ONLY when createdBy is
+  // missing, then $unset `userId` entirely. Do NOT overwrite createdBy when
+  // it's already set — steps 4–6 above may have already attributed it to AFehr
+  // even when userId still points at Lucas's sub.
   for (const coll of ['media_item', 'playlist_item'] as const) {
     const needsCreatedBy = {
       userId: { $exists: true, $type: 'string' as const },
-      $expr: { $ne: ['$createdBy', '$userId'] },
+      $or: [{ createdBy: { $exists: false } }, { createdBy: null }],
     };
     if (DRY_RUN) {
       const n = await db.collection(coll).countDocuments(needsCreatedBy as any);
-      log(`[dry-run] ${coll}: would copy userId → createdBy on ${n} rows`);
+      log(`[dry-run] ${coll}: would copy userId → createdBy on ${n} rows (only when createdBy missing)`);
     } else {
       const r = await db
         .collection(coll)
