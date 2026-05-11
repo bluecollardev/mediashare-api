@@ -56,6 +56,30 @@ export class SearchController {
           contentType: 'mediaItem',
         }));
         break;
+      // Subscriber-content-only targets. Skip userId so the service runs
+      // the else-branch of buildAggregateQuery — matching only the
+      // configured app-subscriber-content creators' public/subscription
+      // content. Used by Library "Include Network Content" toggle.
+      case 'network-playlists':
+        results = await this.playlistService.search({
+          query,
+          tags: parsedTags,
+        });
+        results = results.map((result) => ({
+          ...result,
+          contentType: 'playlist',
+        }));
+        break;
+      case 'network-media':
+        results = await this.mediaItemService.search({
+          query,
+          tags: parsedTags,
+        });
+        results = results.map((result) => ({
+          ...result,
+          contentType: 'mediaItem',
+        }));
+        break;
       case 'playlists':
       default:
         results = await this.playlistService.search({
