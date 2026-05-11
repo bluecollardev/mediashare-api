@@ -30,6 +30,8 @@ import {
   ListUsersCommand,
   AdminCreateUserCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const ADAM = {
   email: 'Atfehr.pt@gmail.com',
@@ -290,6 +292,48 @@ async function reattribute(db: Db, adamSub: string) {
         `media_item (transitive via playlist_item): modified=${r.modifiedCount}`
       );
     }
+  }
+
+  // ---- 6b. media_items: authoritative list from the older backup --------
+  // The transitive step (6) only catches media_items that are referenced by
+  // an AFehr playlist_item. Media items not used in any playlist (or only
+  // used in Lucas's own playlists) get missed. data/afehr-original-media-ids.json
+  // holds the canonical pre-Dec-2023-migration AFehr ownership set —
+  // extracted once from data/mediashare-backup.20230125-1907.tar.gz.
+  try {
+    const idsFilePath = path.resolve(
+      __dirname,
+      '..',
+      'data',
+      'afehr-original-media-ids.json'
+    );
+    const raw = fs.readFileSync(idsFilePath, 'utf-8');
+    const data = JSON.parse(raw) as { ids: string[] };
+    const authoritativeIds = (data.ids || []).map((s) => new ObjectId(s));
+    if (authoritativeIds.length > 0) {
+      const filter = {
+        _id: { $in: authoritativeIds },
+        createdBy: { $ne: adamSub },
+      };
+      if (DRY_RUN) {
+        const n = await db.collection('media_item').countDocuments(filter);
+        log(
+          `[dry-run] would update ${n} media_items from authoritative AFehr id list`
+        );
+      } else {
+        const r = await db
+          .collection('media_item')
+          .updateMany(filter, { $set: { createdBy: adamSub } });
+        (updates as any).mediaItemByAuthoritativeList = r.modifiedCount;
+        log(
+          `media_item (authoritative id list): modified=${r.modifiedCount}`
+        );
+      }
+    }
+  } catch (err) {
+    log(
+      `media_item authoritative-list step skipped: ${(err as Error).message}`
+    );
   }
 
   // ---- 7. Legacy schema cleanup: media_item & playlist_item ------------
