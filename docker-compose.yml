@@ -98,10 +98,10 @@ services:
   #      - com.datadoghq.tags.env="staging"
   #      - com.datadoghq.tags.version="0.0.1"
   db:
-    image: mongo:4.0.4
+    image: mongo:7.0
     container_name: db
     volumes:
-      - ms-mongo-data:/var/lib/mongodb/data
+      - ms-mongo-data:/data/db
     ports:
       - '27017:27017'
     networks:
