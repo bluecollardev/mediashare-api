@@ -56,16 +56,16 @@ describe('subscriber-content union ($match shape)', () => {
   test('Lucas with subscriberIds=[AFehr] sees his own + AFehr public/subscription playlists', async () => {
     const match = buildUnionMatch(LUCAS_SUB, [ADAM_SUB]);
     const count = await db.collection('playlist').countDocuments(match as any);
-    // Lucas owns 2 playlists. AFehr owns 267, all visibility 'subscription'.
-    // Union (with no overlap) = 269.
-    expect(count).toBe(269);
+    // Lucas owns 3 playlists. AFehr owns 267, all visibility 'subscription'.
+    // Union (with no overlap) = 270.
+    expect(count).toBe(270);
   });
 
-  test('Lucas alone (default subscriberIds) sees only his 2 playlists', async () => {
+  test('Lucas alone (default subscriberIds) sees only his 3 playlists', async () => {
     // Default config is ['default'] — a sentinel that matches no real createdBy.
     const match = buildUnionMatch(LUCAS_SUB, ['default']);
     const count = await db.collection('playlist').countDocuments(match as any);
-    expect(count).toBe(2);
+    expect(count).toBe(3);
   });
 
   test('AFehr with subscriberIds=[AFehr] sees only his 267 (no duplicates via $or)', async () => {

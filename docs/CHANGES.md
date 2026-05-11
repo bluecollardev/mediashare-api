@@ -149,3 +149,23 @@ Then reload the web app; `GET /api/playlists` should return 269 entries for Luca
 ### Cognito follow-up
 
 To actually log in as AFehr in the web app, his Cognito user must exist in pool `us-west-2_NIibhhG4d`. Re-run `yarn seed:users` once AWS credentials are configured locally. The seeder will then call `ListUsers` + `AdminCreateUser` as needed.
+
+---
+
+## 2026-05-11 (later) · Pending-items cleanup pass
+
+Closed the remaining P1/P2 items the user flagged:
+
+| # | Item | Resolution |
+| - | ---- | ---------- |
+| 7 | Legacy ObjectId `createdBy` on the brodnik3 playlist | Seeder step 9 deletes any playlist with ObjectId-typed `createdBy`. 1 row removed. |
+| 9 | Schema drift on `PlaylistItem` (wire fields not in entity) | Declared `username`, `author`, `authorProfile`, `category` columns on `PlaylistItem`. |
+| 10 | `UserConnection` had commented-out `ObjectIdColumn` decorators | Removed commented decorators; kept string columns matching the actual data. |
+| 11 | Frontend release-channel TODO | Removed the TODO + `Updates.releaseChannel` reference; documented why (`expo-updates` not in wrapper deps). |
+| Tag images | "Tag images should be referenced in an old DB backup" | Confirmed — `data/mediashare-backup.20230120-2323.tar.gz` and `.20230125-1907` both have 40 tags with `imageSrc` pointing at the dev S3 bucket. Embedded the {key → imageSrc} map in the seeder (step 8). 40 rows updated. |
+| Search UX | Filters needed two clicks; no Clear button; Done button crunched | `withSearchComponent.tsx`: filter panel now shows whenever `forcedSearchMode \|\| searchActive` (no more gated on dirty-flag); added Clear button (`hasActiveFilters()` + `clearSearch()`); bumped `multiSelect.styles.button.minHeight: 48` with padding so Done isn't cramped. |
+
+Still deferred (blocked or low-value):
+- (#12) `react-native-paper` `withTheme` warning — silenced via the console filter in `index.js`. Fixing at source would mean either upgrading `react-native-paper` or patching `withTheme` to use `forwardRef` — both risk cascading. Leaving silenced.
+- (#13) Expo SDK version drift — patches in `bcdev_mediashare-app/patches/` make Expo 47 work; touching versions would invalidate them.
+- Cognito user creation for AFehr — still blocked on AWS credentials in dev env.

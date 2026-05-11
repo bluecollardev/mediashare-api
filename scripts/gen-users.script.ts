@@ -328,6 +328,81 @@ async function reattribute(db: Db, adamSub: string) {
     }
   }
 
+  // ---- 8. Restore tag imageSrc URLs from the pre-2023 backup ------------
+  // The Dec-2023 migration also stripped `imageSrc` off every tag. The image
+  // files still live in the S3 bucket; we just need to re-attach the URLs.
+  // Map extracted from `data/mediashare-backup.20230125-1907.tar.gz`.
+  const TAG_IMAGE_SRC_BASE =
+    'https://mediashare0079445c24114369af875159b71aee1c04439-dev.s3.amazonaws.com/public/tags';
+  const tagImageMap: Record<string, string> = {
+    shoulder: `${TAG_IMAGE_SRC_BASE}/shoulder.jpg`,
+    neck: `${TAG_IMAGE_SRC_BASE}/neck.jpg`,
+    'upper-back': `${TAG_IMAGE_SRC_BASE}/upper-back.jpg`,
+    'lower-back': `${TAG_IMAGE_SRC_BASE}/lower-back.jpg`,
+    elbow: `${TAG_IMAGE_SRC_BASE}/elbow.jpg`,
+    wrist: `${TAG_IMAGE_SRC_BASE}/wrist.jpg`,
+    hand: `${TAG_IMAGE_SRC_BASE}/hand.jpg`,
+    hip: `${TAG_IMAGE_SRC_BASE}/hip.jpg`,
+    knee: `${TAG_IMAGE_SRC_BASE}/knee.jpg`,
+    'foot-and-ankle': `${TAG_IMAGE_SRC_BASE}/foot-and-ankle.jpg`,
+    pricing: `${TAG_IMAGE_SRC_BASE}/pricing.jpg`,
+    mobility: `${TAG_IMAGE_SRC_BASE}/mobility.jpg`,
+    strength: `${TAG_IMAGE_SRC_BASE}/strength.jpg`,
+    stability: `${TAG_IMAGE_SRC_BASE}/stability.jpg`,
+    power: `${TAG_IMAGE_SRC_BASE}/power.jpg`,
+    'pain-relief': `${TAG_IMAGE_SRC_BASE}/pain-relief.jpg`,
+    neurodynamics: `${TAG_IMAGE_SRC_BASE}/neurodynamics.jpg`,
+    'self-assessments': `${TAG_IMAGE_SRC_BASE}/self-assessments.jpg`,
+    'activity-and-postural-modifications': `${TAG_IMAGE_SRC_BASE}/modifications.jpg`,
+    'weightlifting-technique': `${TAG_IMAGE_SRC_BASE}/technique.jpg`,
+    'talking-videos': `${TAG_IMAGE_SRC_BASE}/talking-videos.jpg`,
+    'rehab-programs': `${TAG_IMAGE_SRC_BASE}/rehab-programs.jpg`,
+    'prehab-programs': `${TAG_IMAGE_SRC_BASE}/prehab-programs.jpg`,
+    'mobility-progressions': `${TAG_IMAGE_SRC_BASE}/mobility.jpg`,
+    'strength-progressions': `${TAG_IMAGE_SRC_BASE}/strength.jpg`,
+    'stability-progressions': `${TAG_IMAGE_SRC_BASE}/stability.jpg`,
+    'power-progressions': `${TAG_IMAGE_SRC_BASE}/power.jpg`,
+    'misc-routines': `${TAG_IMAGE_SRC_BASE}/routines.jpg`,
+  };
+
+  let tagImageSet = 0;
+  for (const [key, imageSrc] of Object.entries(tagImageMap)) {
+    const filter = { key, $or: [{ imageSrc: { $exists: false } }, { imageSrc: null }, { imageSrc: '' }, { imageSrc: { $ne: imageSrc } }] };
+    if (DRY_RUN) {
+      const n = await db.collection('tags').countDocuments(filter as any);
+      if (n > 0) log(`[dry-run] tags '${key}': would set imageSrc on ${n} doc(s)`);
+    } else {
+      const r = await db
+        .collection('tags')
+        .updateMany(filter as any, { $set: { imageSrc } });
+      tagImageSet += r.modifiedCount;
+    }
+  }
+  if (!DRY_RUN) {
+    (updates as any).tagImageSrcRestored = tagImageSet;
+    log(`tags: imageSrc restored on ${tagImageSet} rows`);
+  }
+
+  // ---- 9. Drop the dangling ObjectId-typed playlist ---------------------
+  // One playlist has `createdBy: ObjectId(...)` left over from the pre-string
+  // schema. The owner no longer exists in the user collection; the playlist
+  // is invisible to the read path. Remove it.
+  {
+    const filter = {
+      createdBy: { $type: 'objectId' as const },
+    };
+    if (DRY_RUN) {
+      const n = await db.collection('playlist').countDocuments(filter as any);
+      log(`[dry-run] would delete ${n} playlist(s) with ObjectId-typed createdBy`);
+    } else {
+      const r = await db.collection('playlist').deleteMany(filter as any);
+      (updates as any).playlistObjectIdCreatedByDeleted = r.deletedCount;
+      log(
+        `playlist (ObjectId createdBy cleanup): deleted=${r.deletedCount}`
+      );
+    }
+  }
+
   return updates;
 }
 

@@ -55,4 +55,18 @@ export class PlaylistItem extends ApiBaseEntity {
 
   @Column({ name: 'tags', array: true, nullable: true })
   tags: TagKeyValue[];
+
+  // Denormalized snapshots of the original creator. Preserved across clones
+  // so attribution survives even when `createdBy` shifts to the cloning user.
+  @Column({ nullable: true })
+  username?: string;
+
+  @Column({ nullable: true })
+  author?: Record<string, any>;
+
+  @Column({ nullable: true })
+  authorProfile?: Record<string, any>;
+
+  @Column({ nullable: true })
+  category?: string;
 }
