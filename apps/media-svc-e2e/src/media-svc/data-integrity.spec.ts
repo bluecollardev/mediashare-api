@@ -18,7 +18,9 @@ let client: MongoClient;
 let db: Db;
 
 beforeAll(async () => {
-  client = await new MongoClient(MONGO_URI, { serverSelectionTimeoutMS: 3000 }).connect();
+  client = await new MongoClient(MONGO_URI, {
+    serverSelectionTimeoutMS: 3000,
+  }).connect();
   db = client.db(MONGO_DB);
 });
 

@@ -12,21 +12,21 @@ Defined in `libs/core/src/lib/entities/`. Concrete entities extend these.
 
 ### `ApiBaseEntity`
 
-| Field | Type | Notes |
-|---|---|---|
-| `_id` | `ObjectId` | Mongo primary key |
-| `createdBy` | `string` | **AWS Cognito `sub` of the creator** (not a Mongo `_id`) |
-| `createdAt` | `Date` | auto-managed |
-| `updatedDate` | `Date` | auto-managed |
+| Field         | Type       | Notes                                                    |
+| ------------- | ---------- | -------------------------------------------------------- |
+| `_id`         | `ObjectId` | Mongo primary key                                        |
+| `createdBy`   | `string`   | **AWS Cognito `sub` of the creator** (not a Mongo `_id`) |
+| `createdAt`   | `Date`     | auto-managed                                             |
+| `updatedDate` | `Date`     | auto-managed                                             |
 
 ### `KeyPair<T>` extends `ApiBaseEntity`
 
 Generic key/value pair used as a base for `Tag` and `Stat`.
 
-| Field | Type |
-|---|---|
-| `key` | `string` |
-| `value` | `T` |
+| Field   | Type     |
+| ------- | -------- |
+| `key`   | `string` |
+| `value` | `T`      |
 
 ---
 
@@ -38,21 +38,21 @@ Generic key/value pair used as a base for `Tag` and `Stat`.
 
 Identity and profile. The canonical link to AWS Cognito is `sub`, not `_id`. Subscription/billing fields hang directly off the user document.
 
-| Field | Type | Notes |
-|---|---|---|
-| `sub` | `string` | **AWS Cognito subject ID** — used everywhere as the "owner" identifier |
-| `username`, `email`, `firstName`, `lastName`, `phoneNumber`, `imageSrc` | `string` | profile |
-| `role` | `BcRolesType` | enum (`BC_ROLES`) |
-| `isDisabled` | `boolean` | admin lockout flag |
-| `transactionId`, `transactionDate`, `transactionEndDate` | `string` | subscription lifecycle |
+| Field                                                                   | Type          | Notes                                                                  |
+| ----------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------- |
+| `sub`                                                                   | `string`      | **AWS Cognito subject ID** — used everywhere as the "owner" identifier |
+| `username`, `email`, `firstName`, `lastName`, `phoneNumber`, `imageSrc` | `string`      | profile                                                                |
+| `role`                                                                  | `BcRolesType` | enum (`BC_ROLES`)                                                      |
+| `isDisabled`                                                            | `boolean`     | admin lockout flag                                                     |
+| `transactionId`, `transactionDate`, `transactionEndDate`                | `string`      | subscription lifecycle                                                 |
 
 #### `UserConnection` — collection `user_connection`
 
 Directed edge from one user to another (follow / contact). Both ends are **strings**, not ObjectIds — they hold the Cognito `sub` of each user.
 
-| Field | Type |
-|---|---|
-| `userId` | `string` |
+| Field          | Type     |
+| -------------- | -------- |
+| `userId`       | `string` |
 | `connectionId` | `string` |
 
 > **Note:** The entity has commented-out `ObjectIdColumn` decorators. The current schema stores both fields as plain strings. Don't assume a Mongo join works.
@@ -65,26 +65,26 @@ Directed edge from one user to another (follow / contact). Both ends are **strin
 
 A single piece of media (video, audio, etc.) owned by a user.
 
-| Field | Type | Notes |
-|---|---|---|
-| `key` | `string` | S3 key |
-| `userId` | `string` | **Cognito `sub` of owner** (text field, not an ObjectId) |
-| `title`, `summary`, `description`, `uri`, `imageSrc` | `string` | content metadata |
-| `isPlayable` | `boolean` | |
-| `visibility` | `MediaVisibilityType` | enum gating read access |
-| `tags` | `TagKeyValue[]` | **denormalized** — copies, not refs to `tags` collection |
+| Field                                                | Type                  | Notes                                                    |
+| ---------------------------------------------------- | --------------------- | -------------------------------------------------------- |
+| `key`                                                | `string`              | S3 key                                                   |
+| `userId`                                             | `string`              | **Cognito `sub` of owner** (text field, not an ObjectId) |
+| `title`, `summary`, `description`, `uri`, `imageSrc` | `string`              | content metadata                                         |
+| `isPlayable`                                         | `boolean`             |                                                          |
+| `visibility`                                         | `MediaVisibilityType` | enum gating read access                                  |
+| `tags`                                               | `TagKeyValue[]`       | **denormalized** — copies, not refs to `tags` collection |
 
 #### `Playlist` — collection `playlist`
 
 A user-curated, ordered collection of `MediaItem`s.
 
-| Field | Type | Notes |
-|---|---|---|
-| `cloneOf` | `ObjectId?` | self-reference: original Playlist this one was cloned from |
-| `title`, `description`, `imageSrc` | `string` | |
-| `mediaIds` | `ObjectId[]` | ordered list of `MediaItem._id` |
-| `visibility` | `PlaylistVisibilityType` | enum gating read access |
-| `tags` | `TagKeyValue[]` | **denormalized** copies |
+| Field                              | Type                     | Notes                                                      |
+| ---------------------------------- | ------------------------ | ---------------------------------------------------------- |
+| `cloneOf`                          | `ObjectId?`              | self-reference: original Playlist this one was cloned from |
+| `title`, `description`, `imageSrc` | `string`                 |                                                            |
+| `mediaIds`                         | `ObjectId[]`             | ordered list of `MediaItem._id`                            |
+| `visibility`                       | `PlaylistVisibilityType` | enum gating read access                                    |
+| `tags`                             | `TagKeyValue[]`          | **denormalized** copies                                    |
 
 Inherits `createdBy: string` from `ApiBaseEntity` — the Cognito `sub` of the playlist owner.
 
@@ -92,30 +92,31 @@ Inherits `createdBy: string` from `ApiBaseEntity` — the Cognito `sub` of the p
 
 A **per-playlist, user-modifiable override** of a `MediaItem`. The underlying media file (S3 asset) stays untouched in `media_item`; user-editable presentation fields (title, description, thumbnail, sort order, visibility) live on the corresponding `playlist_item` row, scoped to one specific playlist. When a playlist is cloned, fresh `playlist_item` rows are created under the cloning user, preserving the original media reference and original-author attribution.
 
-| Field | Type | Notes |
-|---|---|---|
-| `playlistId` | `ObjectId` | → `Playlist._id` (indexed) |
-| `mediaId` | `ObjectId` | → `MediaItem._id` (indexed) |
-| `userId` | `string` | **playlist owner's Cognito `sub`** (indexed) — re-set on clone |
-| `sortIndex` | `number?` | order within the playlist; absolute value used by the UI |
-| `title`, `summary`, `description`, `uri`, `imageSrc`, `isPlayable` | | seeded from MediaItem at add-time, then editable per-playlist |
-| `visibility` | `MediaVisibilityType` | initial value seeded from source media |
-| `tags` | `TagKeyValue[]` | |
+| Field                                                              | Type                  | Notes                                                          |
+| ------------------------------------------------------------------ | --------------------- | -------------------------------------------------------------- |
+| `playlistId`                                                       | `ObjectId`            | → `Playlist._id` (indexed)                                     |
+| `mediaId`                                                          | `ObjectId`            | → `MediaItem._id` (indexed)                                    |
+| `userId`                                                           | `string`              | **playlist owner's Cognito `sub`** (indexed) — re-set on clone |
+| `sortIndex`                                                        | `number?`             | order within the playlist; absolute value used by the UI       |
+| `title`, `summary`, `description`, `uri`, `imageSrc`, `isPlayable` |                       | seeded from MediaItem at add-time, then editable per-playlist  |
+| `visibility`                                                       | `MediaVisibilityType` | initial value seeded from source media                         |
+| `tags`                                                             | `TagKeyValue[]`       |                                                                |
 
 ##### Wire-only fields (in stored documents, not in the entity class)
 
 The persisted `playlist_item` documents carry additional denormalized fields that the TypeORM entity does **not** declare:
 
-| Field | Shape | Purpose |
-|---|---|---|
-| `username` | `string` | original creator's username (snapshot) |
-| `author` | nested User doc (`_id`, `sub`, `email`, `username`, `role`, `imageSrc`, names, timestamps) | full original-creator snapshot |
-| `authorProfile` | `{ authorId, authorName, authorUsername, authorImage }` | compact attribution used by the UI |
-| `category` | `string` (e.g. `'paid'`) | content category |
+| Field           | Shape                                                                                      | Purpose                                |
+| --------------- | ------------------------------------------------------------------------------------------ | -------------------------------------- |
+| `username`      | `string`                                                                                   | original creator's username (snapshot) |
+| `author`        | nested User doc (`_id`, `sub`, `email`, `username`, `role`, `imageSrc`, names, timestamps) | full original-creator snapshot         |
+| `authorProfile` | `{ authorId, authorName, authorUsername, authorImage }`                                    | compact attribution used by the UI     |
+| `category`      | `string` (e.g. `'paid'`)                                                                   | content category                       |
 
 These survive clones — they pin the original creator's identity onto the cloned row even after `userId`/`createdBy` switch to the cloning user. That's how attribution is preserved when content is forked into another user's library.
 
 > **Two parallel representations of a playlist's contents:**
+>
 > - `Playlist.mediaIds: ObjectId[]` — canonical ordered list of `MediaItem._id`s. **Always references `media_item._id` (never `playlist_item._id`)** — verified against both code (`playlist.service.ts:171-185`) and the demo data (565 distinct values; 558 found in `media_item._id`, 0 in `playlist_item._id`, 7 orphaned by deletion).
 > - `playlist_item` documents — one row per item, joined by `playlistId == playlist._id`. Holds the per-playlist overrides.
 >
@@ -125,11 +126,11 @@ These survive clones — they pin the original creator's identity onto the clone
 
 A share grant from one user to another, for either a playlist OR a single media item.
 
-| Field | Type | Notes |
-|---|---|---|
-| `userSub` | `string` | **recipient's Cognito `sub`** (indexed) |
-| `playlistId` | `ObjectId?` | set when sharing a playlist |
-| `mediaId` | `ObjectId?` | set when sharing a single media item |
+| Field        | Type        | Notes                                   |
+| ------------ | ----------- | --------------------------------------- |
+| `userSub`    | `string`    | **recipient's Cognito `sub`** (indexed) |
+| `playlistId` | `ObjectId?` | set when sharing a playlist             |
+| `mediaId`    | `ObjectId?` | set when sharing a single media item    |
 
 Inherits `createdBy` from `ApiBaseEntity` = the **sharer's** Cognito `sub`.
 
@@ -143,14 +144,14 @@ Inherits `createdBy` from `ApiBaseEntity` = the **sharer's** Cognito `sub`.
 
 A catalog/taxonomy entry. **Not** a foreign-key target — `tags` arrays on Playlist/MediaItem/PlaylistItem are denormalized `TagKeyValue[]` snapshots, not references.
 
-| Field | Type |
-|---|---|
-| `key` | `string` |
-| `value` | `string` |
-| `imageSrc` | `string` |
-| `isMediaTag` | `boolean` |
-| `isPlaylistTag` | `boolean` |
-| `parentIds` | `ObjectId[]` |
+| Field           | Type         |
+| --------------- | ------------ |
+| `key`           | `string`     |
+| `value`         | `string`     |
+| `imageSrc`      | `string`     |
+| `isMediaTag`    | `boolean`    |
+| `isPlaylistTag` | `boolean`    |
+| `parentIds`     | `ObjectId[]` |
 
 Tags form a hierarchy via `parentIds` — used for taxonomy navigation, not for embedded tag references.
 
@@ -228,28 +229,28 @@ The merge rule:
    `User.createdBy`, `MediaItem.userId`, `Playlist.createdBy`, `PlaylistItem.userId`, `ShareItem.userSub`, and both sides of `UserConnection` all hold the Cognito `sub` **as a string**. To answer "what does user X own / share / receive?" you match `User.sub` against those string fields — not against `User._id`.
 
 2. **`PlaylistItem` is a per-playlist override, not a duplicate.**
-   The relationship is: `Playlist.mediaIds[]` references *immutable* `media_item` docs (the actual S3 assets). For each item, an optional `playlist_item` row in the SAME playlist holds *user-editable* overrides of presentation fields (title, description, sort order, etc.). The frontend merges them at render time, preferring the override (see "Frontend rendering" above). This lets a user clone a playlist and customize the titles/descriptions/thumbnails within their copy without touching the original media file.
+   The relationship is: `Playlist.mediaIds[]` references _immutable_ `media_item` docs (the actual S3 assets). For each item, an optional `playlist_item` row in the SAME playlist holds _user-editable_ overrides of presentation fields (title, description, sort order, etc.). The frontend merges them at render time, preferring the override (see "Frontend rendering" above). This lets a user clone a playlist and customize the titles/descriptions/thumbnails within their copy without touching the original media file.
 
 3. **Tags are denormalized everywhere they're shown.**
    The `tags` collection itself is a catalog/typeahead source. Embedded `tags: TagKeyValue[]` arrays on Playlist / MediaItem / PlaylistItem are **copies** taken at write time — updating a `Tag` document does **not** propagate to existing playlists/items.
 
 4. **`Playlist.cloneOf` records the original.**
    When a user clones another user's playlist, the new `Playlist` doc is intended to record the source `_id` in `cloneOf`, and a fresh set of `playlist_item` rows is created with `userId` set to the cloning user (with the original creator preserved on each row via the denormalized `author`/`authorProfile` blobs).
-   
+
    **Caveat from the demo data:** in `data/mediashare-backup.20231230-153439.with-demo-users.tar.gz`, **0 of 270 playlists have `cloneOf` set**. Either the clone path didn't populate it at the time, or the backup pre-dates that field being used. Don't rely on `cloneOf` being present when reading historical data.
 
 5. **The "master user" is a data convention, not a coded primitive.**
    There is no `master`/`root` role in `BC_ROLES` (`guest | free | subscriber | admin`). The "single user whose content is broadcast and cloned by everyone else" pattern is implemented entirely by data: one user creates many playlists with `visibility: 'subscription'` (or `'public'`), and others see them via the visibility-gated read path.
-   
+
    In the demo backup, that user is **Adam Fehr** (`username: AFehr`, `email: Atfehr.pt@gmail.com`, `sub: 5d8b7b90-83fd-4d04-a59c-589ab6bf71f2`, Mongo `_id: 61907743a0c0e20021fa232f`, role `admin`). Note that AFehr **does not appear in the backup's `user` collection** — only as denormalized `author`/`authorProfile` blobs inside `playlist_item` rows. The 269 of 270 playlists in the backup are owned by `createdBy = '117b5484-87f3-43d3-b0b1-b743a432be57'` (Lucas), likely the result of AFehr's content being migrated wholesale into a different account while preserving original-author attribution on each playlist_item.
 
 6. **No real foreign-key constraints.**
    MongoDB via TypeORM enforces no referential integrity. Orphaned refs are real: in the demo data, 7 of 565 distinct `Playlist.mediaIds` values point at `media_item` documents that no longer exist. Defend against this on the read path (the frontend silently drops orphans because they have no spine entry).
 
-5. **`ShareItem` is the bridge for "shared with me" reads.**
+7. **`ShareItem` is the bridge for "shared with me" reads.**
    To list content the current user has access to via sharing (rather than via ownership), query `share_item` where `userSub == currentUser.sub`, then resolve each row's `playlistId` or `mediaId` against the appropriate collection. Visibility flags on the target may further gate the read — confirm against the service code.
 
-6. **No real foreign-key constraints.**
+8. **No real foreign-key constraints.**
    MongoDB via TypeORM enforces no referential integrity. Orphaned `playlist_item` / `share_item` rows (pointing at deleted playlists/media) are possible and should be defended against on the read path.
 
 ---
