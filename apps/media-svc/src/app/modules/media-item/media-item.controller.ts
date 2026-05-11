@@ -145,15 +145,13 @@ export class MediaItemController {
         : typeof tags === 'string'
         ? [tags]
         : undefined;
-      // Always search, we want to run the aggregate query in every case
-      const result =
-        query || tags
-          ? await this.mediaItemService.search({
-              userId,
-              query,
-              tags: parsedTags,
-            })
-          : await this.mediaItemService.getBySub(userId);
+      // Always go through search() — its buildAggregateQuery unions the user's own
+      // content with the configured app-subscriber-content (master) creators.
+      const result = await this.mediaItemService.search({
+        userId,
+        query,
+        tags: parsedTags,
+      });
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);

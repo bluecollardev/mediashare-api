@@ -73,18 +73,33 @@ export class PlaylistDataService extends FilterableDataService<
       }
     }
 
-    // Match by user ID if it's available as it's indexed and this is the best way to reduce the number of results early
+    // Match by user ID if it's available as it's indexed and this is the best way to reduce the number of results early.
+    // Authenticated users see their own content UNION the configured app-subscriber-content
+    // creators' public/subscription playlists. This is what makes "master content user"
+    // visible to every authenticated subscriber.
     if (userId) {
+      const appSubscriberContentUserIds = this.configService.get(
+        'appSubscriberContentUserIds',
+        ['default']
+      );
+      const ownershipOrSubscriberContent = {
+        $or: [
+          { createdBy: userId },
+          {
+            createdBy: {
+              $in: appSubscriberContentUserIds.map((id) => StringIdGuard(id)),
+            },
+            visibility: {
+              $in: [VISIBILITY_PUBLIC, VISIBILITY_SUBSCRIPTION],
+            },
+          },
+        ],
+      };
       aggregateQuery = aggregateQuery.concat([
         {
           $match: query
-            ? {
-                $text: { $search: query },
-                $and: [{ createdBy: userId }],
-              }
-            : {
-                $and: [{ createdBy: userId }],
-              },
+            ? { $text: { $search: query }, ...ownershipOrSubscriberContent }
+            : ownershipOrSubscriberContent,
         },
       ]);
     } else {

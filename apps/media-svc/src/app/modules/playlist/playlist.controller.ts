@@ -166,14 +166,13 @@ export class PlaylistController {
         : typeof tags === 'string'
         ? [tags]
         : undefined;
-      const result =
-        query || tags
-          ? await this.playlistService.search({
-              userId,
-              query,
-              tags: parsedTags,
-            })
-          : await this.playlistService.getBySub(userId);
+      // Always go through search() — its buildAggregateQuery unions the user's own
+      // content with the configured app-subscriber-content (master) creators.
+      const result = await this.playlistService.search({
+        userId,
+        query,
+        tags: parsedTags,
+      });
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);

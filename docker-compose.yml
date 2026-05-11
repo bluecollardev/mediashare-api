@@ -51,6 +51,7 @@ services:
       - DB_SSL=false
       - DB_SYNCHRONIZE=true
       - DB_USERNAME=mongodb
+      - APP_SUBSCRIBER_CONTENT_USER_IDS=5d8b7b90-83fd-4d04-a59c-589ab6bf71f2
   #    labels:
   #      - com.datadoghq.tags.service="user-svc"
   #      - com.datadoghq.tags.env="staging"
@@ -93,6 +94,7 @@ services:
       - DB_SSL=false
       - DB_SYNCHRONIZE=true
       - DB_USERNAME=mongodb
+      - APP_SUBSCRIBER_CONTENT_USER_IDS=5d8b7b90-83fd-4d04-a59c-589ab6bf71f2
   #    labels:
   #      - com.datadoghq.tags.service="media-svc"
   #      - com.datadoghq.tags.env="staging"

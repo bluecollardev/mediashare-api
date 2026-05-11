@@ -239,19 +239,26 @@ The merge rule:
 
    **Caveat from the demo data:** in `data/mediashare-backup.20231230-153439.with-demo-users.tar.gz`, **0 of 270 playlists have `cloneOf` set**. Either the clone path didn't populate it at the time, or the backup pre-dates that field being used. Don't rely on `cloneOf` being present when reading historical data.
 
-5. **The "master user" is a data convention, not a coded primitive.**
-   There is no `master`/`root` role in `BC_ROLES` (`guest | free | subscriber | admin`). The "single user whose content is broadcast and cloned by everyone else" pattern is implemented entirely by data: one user creates many playlists with `visibility: 'subscription'` (or `'public'`), and others see them via the visibility-gated read path.
+5. **The "master content user" pattern is a coded primitive — but the wiring is currently broken.**
+   The model is: a configurable set of user IDs hold the "master" content (subscription/public playlists meant to be visible to every paid subscriber). Other users see that content alongside their own.
 
-   In the demo backup, that user is **Adam Fehr** (`username: AFehr`, `email: Atfehr.pt@gmail.com`, `sub: 5d8b7b90-83fd-4d04-a59c-589ab6bf71f2`, Mongo `_id: 61907743a0c0e20021fa232f`, role `admin`). Note that AFehr **does not appear in the backup's `user` collection** — only as denormalized `author`/`authorProfile` blobs inside `playlist_item` rows. The 269 of 270 playlists in the backup are owned by `createdBy = '117b5484-87f3-43d3-b0b1-b743a432be57'` (Lucas), likely the result of AFehr's content being migrated wholesale into a different account while preserving original-author attribution on each playlist_item.
+   **Configuration:** env var `APP_SUBSCRIBER_CONTENT_USER_IDS` (a list of Cognito subs), read from `apps/{media-svc,user-svc,tags-svc}/src/app/app.configuration.ts:48` into the config key `appSubscriberContentUserIds`. Default value is `['default']` (sentinel that matches no real user).
 
-6. **No real foreign-key constraints.**
+   **Two branches in `buildAggregateQuery`** (`apps/media-svc/src/app/modules/playlist/playlist.service.ts:51-134`):
+   - When `userId` **is provided** → `$match: { createdBy: userId }` (owner-only).
+   - When `userId` **is absent** → `$match: { $and: [ { $or: createdBy IN appSubscriberContentUserIds }, { visibility: { $in: ['public', 'subscription'] } } ] }` (subscriber-content path).
+
+   **Wiring bug:** `GET /api/playlists` (`playlist.controller.ts:155-181`) always passes `userId` from `@CognitoUser('sub')`, so the data service always takes the owner branch. The subscriber-content branch is **unreachable from the authenticated list endpoint**. No `/feed`, `/discover`, or `/popular` route on the playlist controller invokes it either. As a result, even when `APP_SUBSCRIBER_CONTENT_USER_IDS` is set, paying subscribers cannot see the master content via this endpoint.
+
+   **To make the intended behavior work**, the read path needs to union both branches when a user is authenticated, e.g. `$match: { $or: [ { createdBy: userId }, { createdBy: { $in: subscriberIds }, visibility: { $in: ['public', 'subscription'] } } ] }`. The same shape applies to `playlist-item.service.ts:88-…` and `media-item.service.ts` (both already include the subscriber-content branch in their `buildAggregateQuery`).
+
+   **In the demo backup**, the master content is owned by `createdBy = '117b5484-87f3-43d3-b0b1-b743a432be57'` (Lucas) — 269 of 270 playlists, all with `visibility: 'subscription'`. The original-creator attribution on `playlist_item` rows is preserved as **Adam Fehr** (`sub: 5d8b7b90-83fd-4d04-a59c-589ab6bf71f2`) via the denormalized `author`/`authorProfile` blobs. AFehr is **not** in the `user` collection — only as snapshots inside playlist_items. So to test the subscriber-content path with this dataset, you'd set `APP_SUBSCRIBER_CONTENT_USER_IDS=117b5484-87f3-43d3-b0b1-b743a432be57` (Lucas's sub), not AFehr's.
+
+6. **`ShareItem` is the bridge for "shared with me" reads.**
+   To list content the current user has access to via sharing (rather than via ownership or subscriber-content), query `share_item` where `userSub == currentUser.sub`, then resolve each row's `playlistId` or `mediaId` against the appropriate collection. Visibility flags on the target may further gate the read — confirm against the service code.
+
+7. **No real foreign-key constraints.**
    MongoDB via TypeORM enforces no referential integrity. Orphaned refs are real: in the demo data, 7 of 565 distinct `Playlist.mediaIds` values point at `media_item` documents that no longer exist. Defend against this on the read path (the frontend silently drops orphans because they have no spine entry).
-
-7. **`ShareItem` is the bridge for "shared with me" reads.**
-   To list content the current user has access to via sharing (rather than via ownership), query `share_item` where `userSub == currentUser.sub`, then resolve each row's `playlistId` or `mediaId` against the appropriate collection. Visibility flags on the target may further gate the read — confirm against the service code.
-
-8. **No real foreign-key constraints.**
-   MongoDB via TypeORM enforces no referential integrity. Orphaned `playlist_item` / `share_item` rows (pointing at deleted playlists/media) are possible and should be defended against on the read path.
 
 ---
 
