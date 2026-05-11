@@ -367,10 +367,19 @@ async function reattribute(db: Db, adamSub: string) {
 
   let tagImageSet = 0;
   for (const [key, imageSrc] of Object.entries(tagImageMap)) {
-    const filter = { key, $or: [{ imageSrc: { $exists: false } }, { imageSrc: null }, { imageSrc: '' }, { imageSrc: { $ne: imageSrc } }] };
+    const filter = {
+      key,
+      $or: [
+        { imageSrc: { $exists: false } },
+        { imageSrc: null },
+        { imageSrc: '' },
+        { imageSrc: { $ne: imageSrc } },
+      ],
+    };
     if (DRY_RUN) {
       const n = await db.collection('tags').countDocuments(filter as any);
-      if (n > 0) log(`[dry-run] tags '${key}': would set imageSrc on ${n} doc(s)`);
+      if (n > 0)
+        log(`[dry-run] tags '${key}': would set imageSrc on ${n} doc(s)`);
     } else {
       const r = await db
         .collection('tags')
@@ -393,13 +402,13 @@ async function reattribute(db: Db, adamSub: string) {
     };
     if (DRY_RUN) {
       const n = await db.collection('playlist').countDocuments(filter as any);
-      log(`[dry-run] would delete ${n} playlist(s) with ObjectId-typed createdBy`);
+      log(
+        `[dry-run] would delete ${n} playlist(s) with ObjectId-typed createdBy`
+      );
     } else {
       const r = await db.collection('playlist').deleteMany(filter as any);
       (updates as any).playlistObjectIdCreatedByDeleted = r.deletedCount;
-      log(
-        `playlist (ObjectId createdBy cleanup): deleted=${r.deletedCount}`
-      );
+      log(`playlist (ObjectId createdBy cleanup): deleted=${r.deletedCount}`);
     }
   }
 
