@@ -81,7 +81,6 @@ export class SearchController {
         }));
         break;
       case 'playlists':
-      default:
         results = await this.playlistService.search({
           userId,
           query,
@@ -92,6 +91,20 @@ export class SearchController {
           contentType: 'playlist',
         }));
         break;
+      // Union of playlists + media items, both unioned with the
+      // configured subscriber-content creators.
+      case 'all':
+      default: {
+        const [playlists, media] = await Promise.all([
+          this.playlistService.search({ userId, query, tags: parsedTags }),
+          this.mediaItemService.search({ userId, query, tags: parsedTags }),
+        ]);
+        results = [
+          ...playlists.map((r) => ({ ...r, contentType: 'playlist' })),
+          ...media.map((r) => ({ ...r, contentType: 'mediaItem' })),
+        ];
+        break;
+      }
     }
     return results;
   }
