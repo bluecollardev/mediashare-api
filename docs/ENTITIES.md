@@ -245,6 +245,7 @@ The merge rule:
    **Configuration:** env var `APP_SUBSCRIBER_CONTENT_USER_IDS` (a list of Cognito subs), read from `apps/{media-svc,user-svc,tags-svc}/src/app/app.configuration.ts:48` into the config key `appSubscriberContentUserIds`. Default value is `['default']` (sentinel that matches no real user).
 
    **Two branches in `buildAggregateQuery`** (`apps/media-svc/src/app/modules/playlist/playlist.service.ts:51-134`):
+
    - When `userId` **is provided** → `$match: { createdBy: userId }` (owner-only).
    - When `userId` **is absent** → `$match: { $and: [ { $or: createdBy IN appSubscriberContentUserIds }, { visibility: { $in: ['public', 'subscription'] } } ] }` (subscriber-content path).
 

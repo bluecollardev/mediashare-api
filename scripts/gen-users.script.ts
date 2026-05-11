@@ -80,7 +80,9 @@ async function resolveAdamSub(): Promise<string> {
     }
   } catch (err) {
     log(
-      `Cognito lookup failed (${(err as Error).message}); falling back to snapshot sub.`
+      `Cognito lookup failed (${
+        (err as Error).message
+      }); falling back to snapshot sub.`
     );
     return ADAM.snapshotSub;
   }
@@ -115,7 +117,9 @@ async function resolveAdamSub(): Promise<string> {
     return sub;
   } catch (err) {
     log(
-      `Cognito create failed (${(err as Error).message}); falling back to snapshot sub.`
+      `Cognito create failed (${
+        (err as Error).message
+      }); falling back to snapshot sub.`
     );
     return ADAM.snapshotSub;
   }
@@ -136,7 +140,9 @@ async function reattribute(db: Db, adamSub: string) {
   if (DRY_RUN) {
     const existing = await db.collection('user').findOne({ email: ADAM.email });
     log(
-      `[dry-run] would upsert user ${ADAM.email}, sub=${adamSub} (existing=${!!existing})`
+      `[dry-run] would upsert user ${
+        ADAM.email
+      }, sub=${adamSub} (existing=${!!existing})`
     );
   } else {
     const r = await db.collection('user').updateOne(
@@ -157,7 +163,9 @@ async function reattribute(db: Db, adamSub: string) {
     );
     updates.userUpsert = (r.upsertedCount || 0) + (r.modifiedCount || 0);
     log(
-      `user upsert: matched=${r.matchedCount}, modified=${r.modifiedCount}, inserted=${r.upsertedCount || 0}`
+      `user upsert: matched=${r.matchedCount}, modified=${
+        r.modifiedCount
+      }, inserted=${r.upsertedCount || 0}`
     );
   }
 
@@ -166,7 +174,9 @@ async function reattribute(db: Db, adamSub: string) {
     const filter = { createdBy: adamLegacyOid as any };
     if (DRY_RUN) {
       const n = await db.collection('playlist').countDocuments(filter);
-      log(`[dry-run] would update ${n} playlists with createdBy=ObjectId(${ADAM.legacyOid}) → "${adamSub}"`);
+      log(
+        `[dry-run] would update ${n} playlists with createdBy=ObjectId(${ADAM.legacyOid}) → "${adamSub}"`
+      );
     } else {
       const r = await db
         .collection('playlist')
@@ -190,7 +200,9 @@ async function reattribute(db: Db, adamSub: string) {
     };
     if (DRY_RUN) {
       const n = await db.collection('playlist').countDocuments(filter);
-      log(`[dry-run] would reattribute ${n} playlists' createdBy → "${adamSub}" based on playlist_item.author.sub`);
+      log(
+        `[dry-run] would reattribute ${n} playlists' createdBy → "${adamSub}" based on playlist_item.author.sub`
+      );
     } else {
       const r = await db
         .collection('playlist')
@@ -199,7 +211,9 @@ async function reattribute(db: Db, adamSub: string) {
       log(`playlist (by author attribution): modified=${r.modifiedCount}`);
     }
   } else {
-    log('playlist (by author attribution): no playlist_items with AFehr author.sub');
+    log(
+      'playlist (by author attribution): no playlist_items with AFehr author.sub'
+    );
   }
 
   // ---- 4. playlist_items: set userId/createdBy to adamSub; normalize author.sub
@@ -215,7 +229,9 @@ async function reattribute(db: Db, adamSub: string) {
           { 'author.sub': { $ne: adamSub } },
         ],
       });
-      log(`[dry-run] ${total} playlist_items authored by AFehr; ${needsUpdate} need userId/createdBy/author.sub update`);
+      log(
+        `[dry-run] ${total} playlist_items authored by AFehr; ${needsUpdate} need userId/createdBy/author.sub update`
+      );
     } else {
       const r = await db.collection('playlist_item').updateMany(filter, {
         $set: {
@@ -234,9 +250,13 @@ async function reattribute(db: Db, adamSub: string) {
     const filter = { userId: { $in: [ADAM.legacyOid, ADAM.snapshotSub] } };
     if (DRY_RUN) {
       const n = await db.collection('media_item').countDocuments(filter);
-      log(`[dry-run] would update ${n} media_items with userId∈{legacyOid,snapshotSub} → "${adamSub}"`);
+      log(
+        `[dry-run] would update ${n} media_items with userId∈{legacyOid,snapshotSub} → "${adamSub}"`
+      );
     } else {
-      const r = await db.collection('media_item').updateMany(filter, { $set: { userId: adamSub } });
+      const r = await db
+        .collection('media_item')
+        .updateMany(filter, { $set: { userId: adamSub } });
       updates.mediaItemByLegacyId = r.modifiedCount;
       log(`media_item (legacy id): modified=${r.modifiedCount}`);
     }
@@ -250,11 +270,17 @@ async function reattribute(db: Db, adamSub: string) {
     const filter = { _id: { $in: adamMediaIds }, userId: { $ne: adamSub } };
     if (DRY_RUN) {
       const n = await db.collection('media_item').countDocuments(filter);
-      log(`[dry-run] would update ${n} media_items transitively (referenced by AFehr playlist_items)`);
+      log(
+        `[dry-run] would update ${n} media_items transitively (referenced by AFehr playlist_items)`
+      );
     } else {
-      const r = await db.collection('media_item').updateMany(filter, { $set: { userId: adamSub } });
+      const r = await db
+        .collection('media_item')
+        .updateMany(filter, { $set: { userId: adamSub } });
       updates.mediaItemByTransitive = r.modifiedCount;
-      log(`media_item (transitive via playlist_item): modified=${r.modifiedCount}`);
+      log(
+        `media_item (transitive via playlist_item): modified=${r.modifiedCount}`
+      );
     }
   }
 

@@ -12,21 +12,21 @@ Web app login now works (after the patches and submodule bump committed earlier 
 
 ### Open issues to fix this round
 
-| # | Item | Severity | Owner |
-| - | ---- | -------- | ----- |
-| 1 | Subscriber-content branch in `buildAggregateQuery` is unreachable from `GET /api/playlists` (controller always passes `userId`) | P0 | api |
-| 2 | `getBySub` (no-query path) doesn't union owner + subscriber-content either | P0 | api |
-| 3 | Same wiring bug in `media-item.service.ts` and `playlist-item.service.ts` (their `buildAggregateQuery` has the subscriber branch too, also unreachable) | P0 | api |
-| 4 | AFehr (master content user) is not present in the `user` collection; his identity survives only as denormalized `author`/`authorProfile` snapshots on `playlist_item` rows | P0 | api |
-| 5 | No actual seeder. `package.json` declares `seed:users` → `scripts/gen-users.script.ts` but the `scripts/` directory does not exist | P0 | api |
-| 6 | `APP_SUBSCRIBER_CONTENT_USER_IDS` env var is unset; default `['default']` matches no user | P0 | api |
-| 7 | Legacy data shape: 1 playlist has `createdBy` as an `ObjectId` (should be Cognito-sub string); 2 media\_items have `userId` as AFehr's `_id`-as-string (should be his sub) | P1 | api |
-| 8 | Orphan refs: 7 of 565 `Playlist.mediaIds` values point at deleted `media_item._id`s; 7 of 557 `playlist_item.mediaId` values likewise | P1 | api |
-| 9 | Schema drift: `playlist_item` docs carry `username`, `author`, `authorProfile`, `category` not declared on the TypeORM entity | P1 | api |
-| 10 | `UserConnection` entity has commented-out `ObjectIdColumn` decorators; the data stores both ends as plain strings | P1 | api |
-| 11 | Frontend release-channel selection is patched to detect localhost-web but the `TODO: Fix / implement releaseChannel` (use `Updates.releaseChannel`) is still pending | P2 | source |
-| 12 | `react-native-paper` `withTheme` ref warning is silenced via a console filter in `index.js`, not fixed at the source | P2 | app |
-| 13 | Expo SDK version mismatches in wrapper deps (vector-icons, expo-av, react-native, react-native-gesture-handler, react-native-safe-area-context) — warnings only, harmless on web | P3 | app |
+| #   | Item                                                                                                                                                                             | Severity | Owner  |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ |
+| 1   | Subscriber-content branch in `buildAggregateQuery` is unreachable from `GET /api/playlists` (controller always passes `userId`)                                                  | P0       | api    |
+| 2   | `getBySub` (no-query path) doesn't union owner + subscriber-content either                                                                                                       | P0       | api    |
+| 3   | Same wiring bug in `media-item.service.ts` and `playlist-item.service.ts` (their `buildAggregateQuery` has the subscriber branch too, also unreachable)                          | P0       | api    |
+| 4   | AFehr (master content user) is not present in the `user` collection; his identity survives only as denormalized `author`/`authorProfile` snapshots on `playlist_item` rows       | P0       | api    |
+| 5   | No actual seeder. `package.json` declares `seed:users` → `scripts/gen-users.script.ts` but the `scripts/` directory does not exist                                               | P0       | api    |
+| 6   | `APP_SUBSCRIBER_CONTENT_USER_IDS` env var is unset; default `['default']` matches no user                                                                                        | P0       | api    |
+| 7   | Legacy data shape: 1 playlist has `createdBy` as an `ObjectId` (should be Cognito-sub string); 2 media_items have `userId` as AFehr's `_id`-as-string (should be his sub)        | P1       | api    |
+| 8   | Orphan refs: 7 of 565 `Playlist.mediaIds` values point at deleted `media_item._id`s; 7 of 557 `playlist_item.mediaId` values likewise                                            | P1       | api    |
+| 9   | Schema drift: `playlist_item` docs carry `username`, `author`, `authorProfile`, `category` not declared on the TypeORM entity                                                    | P1       | api    |
+| 10  | `UserConnection` entity has commented-out `ObjectIdColumn` decorators; the data stores both ends as plain strings                                                                | P1       | api    |
+| 11  | Frontend release-channel selection is patched to detect localhost-web but the `TODO: Fix / implement releaseChannel` (use `Updates.releaseChannel`) is still pending             | P2       | source |
+| 12  | `react-native-paper` `withTheme` ref warning is silenced via a console filter in `index.js`, not fixed at the source                                                             | P2       | app    |
+| 13  | Expo SDK version mismatches in wrapper deps (vector-icons, expo-av, react-native, react-native-gesture-handler, react-native-safe-area-context) — warnings only, harmless on web | P3       | app    |
 
 ### Plan
 
@@ -88,6 +88,7 @@ The `20231220-0015.replace-userid-object-ids.tar.gz` migration was supposed to c
 **Implication for the seeder:** we have a clear original-truth reference and a clear reattribution rule. The denormalized `playlist_item.author.sub` field (`5d8b7b90-…`) is preserved through the bad migration, so we can re-identify AFehr's content from any of the post-migration states.
 
 Decisions confirmed:
+
 - Seeder lives at `scripts/gen-users.script.ts` (matches existing `package.json` declaration `seed:users`).
 - Cognito user creation in pool `us-west-2_NIibhhG4d` is in scope. Idempotent (lookup by email first; create only if missing).
 - Idempotency end-to-end: rerunning the seeder against an already-correct DB is a no-op.
@@ -113,6 +114,7 @@ Cognito lookup failed locally because AWS credentials aren't configured in this 
 Added `APP_SUBSCRIBER_CONTENT_USER_IDS=5d8b7b90-83fd-4d04-a59c-589ab6bf71f2` to media-svc and user-svc env blocks in `docker-compose.yml`.
 
 **Phase 3 — Tests.** All passing.
+
 - 6/6 existing API data-integrity (unchanged).
 - 7/7 existing frontend selector tests (unchanged).
 - **NEW** 5/5 `subscriber-content.spec.ts`:
