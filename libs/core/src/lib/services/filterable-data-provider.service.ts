@@ -100,9 +100,9 @@ export abstract class FilterableDataService<
     return this.repository.aggregate(pipeline).toArray();
   }
 
-  search({ userId, query, tags }: SearchParameters) {
+  search(params: SearchParameters) {
     try {
-      let pipeline = [...this.buildAggregateQuery({ userId, query, tags })];
+      let pipeline = [...this.buildAggregateQuery(params)];
       const hasTextQuery = pipeline.find((stage) => !!stage?.$match?.$text);
       if (hasTextQuery) {
         pipeline = pipeline.concat(this.buildTextScore());

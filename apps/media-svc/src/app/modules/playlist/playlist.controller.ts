@@ -166,12 +166,15 @@ export class PlaylistController {
         : typeof tags === 'string'
         ? [tags]
         : undefined;
-      // Always go through search() — its buildAggregateQuery unions the user's own
-      // content with the configured app-subscriber-content (master) creators.
+      // Library / "My Playlists" endpoint — owner-only by design. AFehr's
+      // subscriber content shouldn't appear here unless the user has cloned
+      // it (creating their own copy). Search uses /api/search and gets the
+      // unioned view.
       const result = await this.playlistService.search({
         userId,
         query,
         tags: parsedTags,
+        ownerOnly: true,
       });
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {

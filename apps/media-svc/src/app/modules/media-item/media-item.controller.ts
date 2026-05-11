@@ -159,12 +159,13 @@ export class MediaItemController {
         : typeof tags === 'string'
         ? [tags]
         : undefined;
-      // Always go through search() — its buildAggregateQuery unions the user's own
-      // content with the configured app-subscriber-content (master) creators.
+      // Library / "My Media" endpoint — owner-only by design. Subscriber
+      // content shows up via /api/search, not here.
       const result = await this.mediaItemService.search({
         userId,
         query,
         tags: parsedTags,
+        ownerOnly: true,
       });
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {

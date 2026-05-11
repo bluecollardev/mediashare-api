@@ -52,6 +52,7 @@ export class MediaItemDataService extends FilterableDataService<
       tags,
       // TODO: Complete support for tagsMatchingMode (it's not exposed via controller)
       tagsMatchingMode = 'all', // all | any // TODO: Type this!
+      ownerOnly = false,
     }: SearchParameters = params;
 
     let aggregateQuery = [];
@@ -72,28 +73,36 @@ export class MediaItemDataService extends FilterableDataService<
     // Authenticated users see their own media_items UNION the configured app-subscriber-content
     // creators' public/subscription items.
     if (userId) {
-      const appSubscriberContentUserIds = this.configService.get(
-        'app.appSubscriberContentUserIds',
-        ['default']
-      );
-      const ownershipOrSubscriberContent = {
-        $or: [
-          { createdBy: userId },
-          {
-            createdBy: {
-              $in: appSubscriberContentUserIds.map((id) => StringIdGuard(id)),
-            },
-            visibility: {
-              $in: [VISIBILITY_PUBLIC, VISIBILITY_SUBSCRIPTION],
-            },
-          },
-        ],
-      };
+      // ownerOnly skips the subscriber-content branch — used by Library /
+      // "My Media" endpoints so AFehr's content doesn't appear there.
+      const matchClause = ownerOnly
+        ? { createdBy: userId }
+        : (() => {
+            const appSubscriberContentUserIds = this.configService.get(
+              'app.appSubscriberContentUserIds',
+              ['default']
+            );
+            return {
+              $or: [
+                { createdBy: userId },
+                {
+                  createdBy: {
+                    $in: appSubscriberContentUserIds.map((id) =>
+                      StringIdGuard(id)
+                    ),
+                  },
+                  visibility: {
+                    $in: [VISIBILITY_PUBLIC, VISIBILITY_SUBSCRIPTION],
+                  },
+                },
+              ],
+            };
+          })();
       aggregateQuery = aggregateQuery.concat([
         {
           $match: query
-            ? { $text: { $search: query }, ...ownershipOrSubscriberContent }
-            : ownershipOrSubscriberContent,
+            ? { $text: { $search: query }, ...matchClause }
+            : matchClause,
         },
       ]);
     } else {
@@ -286,7 +295,7 @@ export class MediaItemService {
     return await this.dataService.getPopular();
   }
 
-  async search({ userId, query, tags }: SearchParameters) {
-    return await this.dataService.search({ userId, query, tags });
+  async search(params: SearchParameters) {
+    return await this.dataService.search(params);
   }
 }
