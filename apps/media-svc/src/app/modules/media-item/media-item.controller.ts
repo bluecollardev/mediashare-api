@@ -171,5 +171,4 @@ export class MediaItemController {
       return handleErrorResponse(res, error);
     }
   }
-
 }

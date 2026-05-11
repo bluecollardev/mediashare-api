@@ -180,5 +180,4 @@ export class PlaylistItemController {
       return handleErrorResponse(res, error);
     }
   }
-
 }
