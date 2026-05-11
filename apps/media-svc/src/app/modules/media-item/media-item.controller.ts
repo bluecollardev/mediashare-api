@@ -102,6 +102,21 @@ export class MediaItemController {
     }
   }
 
+  // NOTE: declared BEFORE the `:mediaId` route so '/popular' doesn't get
+  // matched as `findOne('popular')` (which then fails ObjectIdGuard).
+  @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
+  @ApiBearerAuth()
+  @Get('popular')
+  @MediaGetResponse({ isArray: true })
+  async findPopular(@Res() res: Response) {
+    try {
+      const result = await this.mediaItemService.getPopular();
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
   @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
   @ApiBearerAuth()
   @ApiParam({ name: ParamTokens.mediaId, type: String, required: true })
@@ -157,16 +172,4 @@ export class MediaItemController {
     }
   }
 
-  @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
-  @ApiBearerAuth()
-  @Get('popular')
-  @MediaGetResponse({ isArray: true })
-  async findPopular(@Res() res: Response) {
-    try {
-      const result = await this.mediaItemService.getPopular();
-      return handleSuccessResponse(res, HttpStatus.OK, result);
-    } catch (error) {
-      return handleErrorResponse(res, error);
-    }
-  }
 }

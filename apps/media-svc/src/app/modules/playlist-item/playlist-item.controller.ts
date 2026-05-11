@@ -114,6 +114,21 @@ export class PlaylistItemController {
     }
   }
 
+  // NOTE: declared BEFORE the `:playlistItemId` route so '/popular' doesn't
+  // get matched as `findOne('popular')` (which then fails ObjectIdGuard).
+  @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
+  @ApiBearerAuth()
+  @Get('popular')
+  @PlaylistItemGetResponse({ isArray: true })
+  async findPopular(@Res() res: Response) {
+    try {
+      const result = await this.playlistItemService.getPopular();
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
   @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
   @ApiBearerAuth()
   @ApiParam({ name: ParamTokens.playlistItemId, type: String, required: true })
@@ -166,16 +181,4 @@ export class PlaylistItemController {
     }
   }
 
-  @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
-  @ApiBearerAuth()
-  @Get('popular')
-  @PlaylistItemGetResponse({ isArray: true })
-  async findPopular(@Res() res: Response) {
-    try {
-      const result = await this.playlistItemService.getPopular();
-      return handleSuccessResponse(res, HttpStatus.OK, result);
-    } catch (error) {
-      return handleErrorResponse(res, error);
-    }
-  }
 }
