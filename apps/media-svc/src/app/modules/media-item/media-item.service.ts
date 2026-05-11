@@ -239,6 +239,12 @@ export class MediaItemService {
       CreateMediaItemDto,
       MediaItem
     );
+    // AutoMapper only copies fields declared on CreateMediaItemDto.
+    // The controller injects createdBy onto the input object (cast to
+    // any) so we re-attach it here — without this the saved entity
+    // has no owner and never shows up in the user's Library.
+    const createdBy = (createMediaItemDto as any).createdBy;
+    if (createdBy) entity.createdBy = createdBy;
     const result = await this.dataService.create(entity);
     return await this.classMapper.mapAsync(result, MediaItem, MediaItemDto);
   }
