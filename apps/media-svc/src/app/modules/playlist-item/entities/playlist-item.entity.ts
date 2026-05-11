@@ -20,11 +20,6 @@ export class PlaylistItem extends ApiBaseEntity {
   @Index('mediaId')
   mediaId: ObjectId;
 
-  @AutoMap({ typeFn: () => ObjectId } as AutoMapOptions)
-  @Column({ nullable: false, type: 'text' })
-  @Index('userId', { unique: false })
-  userId: string;
-
   @AutoMap()
   @Column({ nullable: true })
   sortIndex?: number;

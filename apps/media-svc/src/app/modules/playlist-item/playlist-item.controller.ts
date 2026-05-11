@@ -64,7 +64,6 @@ export class PlaylistItemController {
         uri: '',
         ...mediaItem,
         createdBy,
-        userId: createdBy,
         playlistId: playlistId,
         mediaId: mediaId,
         sortIndex,

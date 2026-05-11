@@ -73,7 +73,7 @@ export class PlaylistItemDataService extends FilterableDataService<
     // creators' public/subscription rows.
     if (userId) {
       const appSubscriberContentUserIds = this.configService.get(
-        'appSubscriberContentUserIds',
+        'app.appSubscriberContentUserIds',
         ['default']
       );
       const ownershipOrSubscriberContent = {
@@ -99,7 +99,7 @@ export class PlaylistItemDataService extends FilterableDataService<
     } else {
       // Only return search results that are app subscriber content (for paying app subscribers), shared content from a user's network, or public content
       const appSubscriberContentUserIds = this.configService.get(
-        'appSubscriberContentUserIds',
+        'app.appSubscriberContentUserIds',
         ['default']
       );
       aggregateQuery = aggregateQuery.concat([
@@ -192,7 +192,6 @@ export class PlaylistItemDataService extends FilterableDataService<
               _id: '$_id',
               playlistId: '$playlistId',
               // mediaId: '$mediaId',
-              userId: '$userId',
               ...this.buildAuthorReplaceRootDetails(),
               title: '$title',
               description: '$description',

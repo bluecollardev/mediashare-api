@@ -73,7 +73,7 @@ export class MediaItemDataService extends FilterableDataService<
     // creators' public/subscription items.
     if (userId) {
       const appSubscriberContentUserIds = this.configService.get(
-        'appSubscriberContentUserIds',
+        'app.appSubscriberContentUserIds',
         ['default']
       );
       const ownershipOrSubscriberContent = {
@@ -99,7 +99,7 @@ export class MediaItemDataService extends FilterableDataService<
     } else {
       // Only return search results that are app subscriber content (for paying app subscribers), shared content from a user's network, or public content
       const appSubscriberContentUserIds = this.configService.get(
-        'appSubscriberContentUserIds',
+        'app.appSubscriberContentUserIds',
         ['default']
       );
       aggregateQuery = aggregateQuery.concat([
@@ -190,7 +190,6 @@ export class MediaItemDataService extends FilterableDataService<
           $mergeObjects: [
             {
               _id: '$_id',
-              userId: '$userId',
               ...this.buildAuthorReplaceRootDetails(),
               title: '$title',
               description: '$description',

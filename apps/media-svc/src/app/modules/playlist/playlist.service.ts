@@ -79,7 +79,7 @@ export class PlaylistDataService extends FilterableDataService<
     // visible to every authenticated subscriber.
     if (userId) {
       const appSubscriberContentUserIds = this.configService.get(
-        'appSubscriberContentUserIds',
+        'app.appSubscriberContentUserIds',
         ['default']
       );
       const ownershipOrSubscriberContent = {
@@ -105,7 +105,7 @@ export class PlaylistDataService extends FilterableDataService<
     } else {
       // Only return search results that are app subscriber content (for paying app subscribers), shared content from a user's network, or public content
       const appSubscriberContentUserIds = this.configService.get(
-        'appSubscriberContentUserIds',
+        'app.appSubscriberContentUserIds',
         ['default']
       );
       aggregateQuery = aggregateQuery.concat([

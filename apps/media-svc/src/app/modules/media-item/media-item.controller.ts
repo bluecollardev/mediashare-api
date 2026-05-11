@@ -54,7 +54,6 @@ export class MediaItemController {
         isPlayable: false,
         uri: '',
         ...createMediaItemDto,
-        userId: createdBy,
         createdBy,
       } as any;
       const result = await this.mediaItemService.create({

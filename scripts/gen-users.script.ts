@@ -235,7 +235,6 @@ async function reattribute(db: Db, adamSub: string) {
     } else {
       const r = await db.collection('playlist_item').updateMany(filter, {
         $set: {
-          userId: adamSub,
           createdBy: adamSub,
           'author.sub': adamSub,
         },
@@ -245,18 +244,27 @@ async function reattribute(db: Db, adamSub: string) {
     }
   }
 
-  // ---- 5. media_items: legacy ObjectId-as-string in userId --------------
+  // ---- 5. media_items: identify AFehr's by legacy fields and set createdBy
+  // Legacy data carries `userId` (either his _id-as-string or his snapshot sub).
+  // The new schema uses `createdBy` only — set that. The legacy field gets
+  // $unset in step 7.
   {
-    const filter = { userId: { $in: [ADAM.legacyOid, ADAM.snapshotSub] } };
+    const filter = {
+      $or: [
+        { userId: { $in: [ADAM.legacyOid, ADAM.snapshotSub] } },
+        { createdBy: { $in: [ADAM.legacyOid, ADAM.snapshotSub] } },
+      ],
+      createdBy: { $ne: adamSub },
+    };
     if (DRY_RUN) {
-      const n = await db.collection('media_item').countDocuments(filter);
+      const n = await db.collection('media_item').countDocuments(filter as any);
       log(
-        `[dry-run] would update ${n} media_items with userId∈{legacyOid,snapshotSub} → "${adamSub}"`
+        `[dry-run] would update ${n} media_items with legacy AFehr id → createdBy "${adamSub}"`
       );
     } else {
       const r = await db
         .collection('media_item')
-        .updateMany(filter, { $set: { userId: adamSub } });
+        .updateMany(filter as any, { $set: { createdBy: adamSub } });
       updates.mediaItemByLegacyId = r.modifiedCount;
       log(`media_item (legacy id): modified=${r.modifiedCount}`);
     }
@@ -267,7 +275,7 @@ async function reattribute(db: Db, adamSub: string) {
     .collection('playlist_item')
     .distinct('mediaId', { 'author.sub': { $in: adamAuthorSubs } });
   if (adamMediaIds.length > 0) {
-    const filter = { _id: { $in: adamMediaIds }, userId: { $ne: adamSub } };
+    const filter = { _id: { $in: adamMediaIds }, createdBy: { $ne: adamSub } };
     if (DRY_RUN) {
       const n = await db.collection('media_item').countDocuments(filter);
       log(
@@ -276,11 +284,47 @@ async function reattribute(db: Db, adamSub: string) {
     } else {
       const r = await db
         .collection('media_item')
-        .updateMany(filter, { $set: { userId: adamSub } });
+        .updateMany(filter, { $set: { createdBy: adamSub } });
       updates.mediaItemByTransitive = r.modifiedCount;
       log(
         `media_item (transitive via playlist_item): modified=${r.modifiedCount}`
       );
+    }
+  }
+
+  // ---- 7. Legacy schema cleanup: media_item & playlist_item ------------
+  // The legacy schema duplicated ownership across `userId` and (the inherited)
+  // `createdBy`. The new schema has only `createdBy`. Migrate any rows still
+  // carrying `userId` by copying it to `createdBy` (when needed), then $unset
+  // `userId` entirely.
+  for (const coll of ['media_item', 'playlist_item'] as const) {
+    const needsCreatedBy = {
+      userId: { $exists: true, $type: 'string' as const },
+      $expr: { $ne: ['$createdBy', '$userId'] },
+    };
+    if (DRY_RUN) {
+      const n = await db.collection(coll).countDocuments(needsCreatedBy as any);
+      log(`[dry-run] ${coll}: would copy userId → createdBy on ${n} rows`);
+    } else {
+      const r = await db
+        .collection(coll)
+        .updateMany(needsCreatedBy as any, [
+          { $set: { createdBy: '$userId' } },
+        ]);
+      (updates as any)[`${coll}_createdBy_set`] = r.modifiedCount;
+      log(`${coll}: createdBy set from userId on ${r.modifiedCount} rows`);
+    }
+
+    const hasLegacyUserId = { userId: { $exists: true } };
+    if (DRY_RUN) {
+      const n = await db.collection(coll).countDocuments(hasLegacyUserId);
+      log(`[dry-run] ${coll}: would $unset userId on ${n} rows`);
+    } else {
+      const r = await db
+        .collection(coll)
+        .updateMany(hasLegacyUserId, { $unset: { userId: '' } });
+      (updates as any)[`${coll}_userId_unset`] = r.modifiedCount;
+      log(`${coll}: $unset userId on ${r.modifiedCount} rows`);
     }
   }
 
