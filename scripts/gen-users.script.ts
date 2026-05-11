@@ -325,9 +325,7 @@ async function reattribute(db: Db, adamSub: string) {
           .collection('media_item')
           .updateMany(filter, { $set: { createdBy: adamSub } });
         (updates as any).mediaItemByAuthoritativeList = r.modifiedCount;
-        log(
-          `media_item (authoritative id list): modified=${r.modifiedCount}`
-        );
+        log(`media_item (authoritative id list): modified=${r.modifiedCount}`);
       }
     }
   } catch (err) {
