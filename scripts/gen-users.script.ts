@@ -306,7 +306,9 @@ async function reattribute(db: Db, adamSub: string) {
     };
     if (DRY_RUN) {
       const n = await db.collection(coll).countDocuments(needsCreatedBy as any);
-      log(`[dry-run] ${coll}: would copy userId → createdBy on ${n} rows (only when createdBy missing)`);
+      log(
+        `[dry-run] ${coll}: would copy userId → createdBy on ${n} rows (only when createdBy missing)`
+      );
     } else {
       const r = await db
         .collection(coll)
