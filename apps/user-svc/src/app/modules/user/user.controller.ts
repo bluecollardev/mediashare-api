@@ -260,7 +260,14 @@ export class UserController {
   @UserGetResponse({ type: UserDto }) // TODO: Change this back to ProfileDto
   async getUser(@Res() res: Response, @Param('userId') userId: string) {
     try {
-      const result = await this.userService.findById(userId);
+      // Callers from the Shared/Contact pages pass a Cognito sub
+      // (UUID) here; older callers pass a Mongo ObjectId. Detect by
+      // shape — a 24-char hex string is treated as an _id, anything
+      // else (UUIDs are 36 chars with hyphens) is looked up by sub.
+      const isObjectId = /^[a-f0-9]{24}$/i.test(userId);
+      const result = isObjectId
+        ? await this.userService.findById(userId)
+        : await this.userService.findByQuery({ where: { sub: userId } });
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);
