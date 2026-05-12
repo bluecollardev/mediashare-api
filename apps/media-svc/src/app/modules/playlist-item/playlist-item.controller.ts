@@ -132,20 +132,21 @@ export class PlaylistItemController {
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { ObjectId } = require('mongodb');
-      const result = await this.playlistItemService.dataService.repository.updateOne(
-        { _id: new ObjectId(playlistItemId) },
-        {
-          $inc: { reportedCount: 1 },
-          $push: {
-            reports: {
-              reason: body?.reason || 'unspecified',
-              comment: body?.comment || '',
-              reporterSub,
-              reportedAt: new Date(),
+      const result =
+        await this.playlistItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(playlistItemId) },
+          {
+            $inc: { reportedCount: 1 },
+            $push: {
+              reports: {
+                reason: body?.reason || 'unspecified',
+                comment: body?.comment || '',
+                reporterSub,
+                reportedAt: new Date(),
+              },
             },
-          },
-        } as any
-      );
+          } as any
+        );
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);
