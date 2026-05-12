@@ -114,6 +114,44 @@ export class PlaylistItemController {
     }
   }
 
+  /**
+   * Report a playlist item as inappropriate. Increments reportedCount
+   * and appends the report (reason / comment / reporter) to a
+   * `reports` array on the doc.
+   */
+  @UseGuards(AuthenticationGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.playlistItemId, type: String, required: true })
+  @Post(`${RouteTokens.playlistItemId}/report`)
+  async reportPlaylistItem(
+    @Res() res: Response,
+    @Param(ParamTokens.playlistItemId) playlistItemId: string,
+    @Body() body: { reason?: string; comment?: string },
+    @CognitoUser('sub') reporterSub: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result = await this.playlistItemService.dataService.repository.updateOne(
+        { _id: new ObjectId(playlistItemId) },
+        {
+          $inc: { reportedCount: 1 },
+          $push: {
+            reports: {
+              reason: body?.reason || 'unspecified',
+              comment: body?.comment || '',
+              reporterSub,
+              reportedAt: new Date(),
+            },
+          },
+        } as any
+      );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
   // NOTE: declared BEFORE the `:playlistItemId` route so '/popular' doesn't
   // get matched as `findOne('popular')` (which then fails ObjectIdGuard).
   @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)

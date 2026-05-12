@@ -102,6 +102,45 @@ export class MediaItemController {
     }
   }
 
+  /**
+   * Report a media item as inappropriate. Increments reportedCount
+   * on the doc — the report dialog on the File Details page sends
+   * an optional reason + comment which we stash on the doc too for
+   * admin review (no separate collection yet).
+   */
+  @UseGuards(AuthenticationGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.mediaId, type: String, required: true })
+  @Post(`${RouteTokens.mediaId}/report`)
+  async reportMediaItem(
+    @Res() res: Response,
+    @Param(ParamTokens.mediaId) mediaId: string,
+    @Body() body: { reason?: string; comment?: string },
+    @CognitoUser('sub') reporterSub: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result = await this.mediaItemService.dataService.repository.updateOne(
+        { _id: new ObjectId(mediaId) },
+        {
+          $inc: { reportedCount: 1 },
+          $push: {
+            reports: {
+              reason: body?.reason || 'unspecified',
+              comment: body?.comment || '',
+              reporterSub,
+              reportedAt: new Date(),
+            },
+          },
+        } as any
+      );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
   // NOTE: declared BEFORE the `:mediaId` route so '/popular' doesn't get
   // matched as `findOne('popular')` (which then fails ObjectIdGuard).
   @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
