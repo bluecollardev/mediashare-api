@@ -49,7 +49,9 @@ export const appConfig = registerAs('app', () => ({
     ? process.env.APP_SUBSCRIBER_CONTENT_USER_IDS.split(',')
     : [],
   appAdminUserEmails: process.env.ADMIN_USER_EMAILS
-    ? process.env.ADMIN_USER_EMAILS.split(',').map((e) => e.trim().toLowerCase())
+    ? process.env.ADMIN_USER_EMAILS.split(',').map((e) =>
+        e.trim().toLowerCase()
+      )
     : [],
 }));
 

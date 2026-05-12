@@ -259,10 +259,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiParam({ name: 'userId', type: String, required: true })
   @Post('/admin/users/:userId/suspend')
-  async suspendUser(
-    @Res() res: Response,
-    @Param('userId') userId: string
-  ) {
+  async suspendUser(@Res() res: Response, @Param('userId') userId: string) {
     try {
       // Refuse to suspend another admin — admins can't be locked out
       // by their peers. The whitelist (ADMIN_USER_EMAILS) is the
@@ -290,10 +287,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiParam({ name: 'userId', type: String, required: true })
   @Post('/admin/users/:userId/unsuspend')
-  async unsuspendUser(
-    @Res() res: Response,
-    @Param('userId') userId: string
-  ) {
+  async unsuspendUser(@Res() res: Response, @Param('userId') userId: string) {
     try {
       const result = await this.userService.dataService.repository.updateOne(
         { _id: this.toObjectId(userId) },
