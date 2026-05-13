@@ -48,6 +48,11 @@ export const appConfig = registerAs('app', () => ({
   appSubscriberContentUserIds: process.env.APP_SUBSCRIBER_CONTENT_USER_IDS
     ? process.env.APP_SUBSCRIBER_CONTENT_USER_IDS.split(',')
     : [],
+  appAdminUserEmails: process.env.ADMIN_USER_EMAILS
+    ? process.env.ADMIN_USER_EMAILS.split(',').map((e) =>
+        e.trim().toLowerCase()
+      )
+    : [],
 }));
 
 export const dbConfig = registerAs('db', () => ({
@@ -55,7 +60,7 @@ export const dbConfig = registerAs('db', () => ({
   url: process.env.DB_URL,
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
-  database: process.env.DB_DATABASE,
+  database: process.env.DB_DATABASE || process.env.DB,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   entities: [__dirname + '/**/*.entity{.ts,.js}'],

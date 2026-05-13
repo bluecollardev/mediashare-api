@@ -20,6 +20,7 @@ import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { MEDIA_VISIBILITY } from '../../core/models';
 import { ParamTokens, RouteTokens } from '@mediashare/core/constants';
+import { AdminGuard } from '../admin/admin.guard';
 import {
   MediaGetResponse,
   MediaPostResponse,
@@ -54,7 +55,6 @@ export class MediaItemController {
         isPlayable: false,
         uri: '',
         ...createMediaItemDto,
-        userId: createdBy,
         createdBy,
       } as any;
       const result = await this.mediaItemService.create({
@@ -103,6 +103,109 @@ export class MediaItemController {
     }
   }
 
+  /**
+   * Report a media item as inappropriate. Increments reportedCount
+   * on the doc — the report dialog on the File Details page sends
+   * an optional reason + comment which we stash on the doc too for
+   * admin review (no separate collection yet).
+   */
+  @UseGuards(AuthenticationGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.mediaId, type: String, required: true })
+  @Post(`${RouteTokens.mediaId}/report`)
+  async reportMediaItem(
+    @Res() res: Response,
+    @Param(ParamTokens.mediaId) mediaId: string,
+    @Body() body: { reason?: string; comment?: string },
+    @CognitoUser('sub') reporterSub: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result =
+        await this.mediaItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(mediaId) },
+          {
+            $inc: { reportedCount: 1 },
+            $push: {
+              reports: {
+                reason: body?.reason || 'unspecified',
+                comment: body?.comment || '',
+                reporterSub,
+                reportedAt: new Date(),
+              },
+            },
+          } as any
+        );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  /**
+   * Admin: suspend / unsuspend a media item. Sets isSuspended on the
+   * doc so feed + search queries can filter it out.
+   */
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.mediaId, type: String, required: true })
+  @Post(`${RouteTokens.mediaId}/suspend`)
+  async suspendMediaItem(
+    @Res() res: Response,
+    @Param(ParamTokens.mediaId) mediaId: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result =
+        await this.mediaItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(mediaId) },
+          { $set: { isSuspended: true } } as any
+        );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.mediaId, type: String, required: true })
+  @Post(`${RouteTokens.mediaId}/unsuspend`)
+  async unsuspendMediaItem(
+    @Res() res: Response,
+    @Param(ParamTokens.mediaId) mediaId: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result =
+        await this.mediaItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(mediaId) },
+          { $set: { isSuspended: false } } as any
+        );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  // NOTE: declared BEFORE the `:mediaId` route so '/popular' doesn't get
+  // matched as `findOne('popular')` (which then fails ObjectIdGuard).
+  @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
+  @ApiBearerAuth()
+  @Get('popular')
+  @MediaGetResponse({ isArray: true })
+  async findPopular(@Res() res: Response) {
+    try {
+      const result = await this.mediaItemService.getPopular();
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
   @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
   @ApiBearerAuth()
   @ApiParam({ name: ParamTokens.mediaId, type: String, required: true })
@@ -145,28 +248,14 @@ export class MediaItemController {
         : typeof tags === 'string'
         ? [tags]
         : undefined;
-      // Always search, we want to run the aggregate query in every case
-      const result =
-        query || tags
-          ? await this.mediaItemService.search({
-              userId,
-              query,
-              tags: parsedTags,
-            })
-          : await this.mediaItemService.getBySub(userId);
-      return handleSuccessResponse(res, HttpStatus.OK, result);
-    } catch (error) {
-      return handleErrorResponse(res, error);
-    }
-  }
-
-  @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
-  @ApiBearerAuth()
-  @Get('popular')
-  @MediaGetResponse({ isArray: true })
-  async findPopular(@Res() res: Response) {
-    try {
-      const result = await this.mediaItemService.getPopular();
+      // Library / "My Media" endpoint — owner-only by design. Subscriber
+      // content shows up via /api/search, not here.
+      const result = await this.mediaItemService.search({
+        userId,
+        query,
+        tags: parsedTags,
+        ownerOnly: true,
+      });
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);

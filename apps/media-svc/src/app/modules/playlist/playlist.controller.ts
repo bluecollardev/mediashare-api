@@ -166,14 +166,16 @@ export class PlaylistController {
         : typeof tags === 'string'
         ? [tags]
         : undefined;
-      const result =
-        query || tags
-          ? await this.playlistService.search({
-              userId,
-              query,
-              tags: parsedTags,
-            })
-          : await this.playlistService.getBySub(userId);
+      // Library / "My Playlists" endpoint — owner-only by design. AFehr's
+      // subscriber content shouldn't appear here unless the user has cloned
+      // it (creating their own copy). Search uses /api/search and gets the
+      // unioned view.
+      const result = await this.playlistService.search({
+        userId,
+        query,
+        tags: parsedTags,
+        ownerOnly: true,
+      });
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);

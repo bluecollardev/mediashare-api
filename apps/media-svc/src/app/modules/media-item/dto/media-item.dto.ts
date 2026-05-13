@@ -18,11 +18,6 @@ export class MediaItemDto extends ApiBaseDto {
   @ApiString({ required: true })
   key: string;
 
-  @IsDefined()
-  @AutoMap()
-  @ApiString({ required: true })
-  userId: string;
-
   @IsString()
   @AutoMap()
   @ApiString({ required: true })

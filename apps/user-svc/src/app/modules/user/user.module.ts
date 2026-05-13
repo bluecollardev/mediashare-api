@@ -5,6 +5,7 @@ import { UserMapping } from './mappers/automapper.profile';
 import { User } from './entities/user.entity';
 import { UserController } from './user.controller';
 import { UserService, UserDataService } from './user.service';
+import { AdminGuard } from './admin.guard';
 import { UserConnection } from '../user-connection/entities/user-connection.entity';
 import { UserConnectionModule } from '../user-connection/user-connection.module';
 import {
@@ -24,6 +25,7 @@ import {
     UserMapping,
     UserConnectionService,
     UserConnectionDataService,
+    AdminGuard,
   ],
   exports: [UserService],
 })

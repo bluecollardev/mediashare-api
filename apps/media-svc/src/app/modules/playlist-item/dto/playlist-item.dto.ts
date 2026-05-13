@@ -24,11 +24,6 @@ export class PlaylistItemDto extends ApiBaseDto {
   @ApiString({ required: true })
   mediaId: string;
 
-  @IsDefined()
-  @AutoMap()
-  @ApiString({ required: true })
-  userId: string;
-
   @IsOptional()
   @AutoMap()
   @ApiString({ required: true })

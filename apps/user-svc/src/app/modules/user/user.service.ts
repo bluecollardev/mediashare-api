@@ -120,6 +120,7 @@ export class UserService {
               transactionId: '$transactionId',
               transactionDate: '$transactionDate',
               transactionEndDate: '$transactionEndDate',
+              isDisabled: '$isDisabled',
             },
           },
         },

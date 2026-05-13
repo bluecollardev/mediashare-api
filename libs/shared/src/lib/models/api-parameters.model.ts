@@ -16,6 +16,10 @@ interface IContentSearchParameters {
   textMatchingMode?: 'and' | 'or';
   tags?: string[];
   tagsMatchingMode?: 'any' | 'all';
+  // When true, ignore the configured app-subscriber-content creators and
+  // return only the requesting user's own content. Library / "My X"
+  // endpoints pass true; the global Search endpoint leaves it unset.
+  ownerOnly?: boolean;
 }
 
 export type ContentSearchParameters = Partial<IContentSearchParameters>;

@@ -51,6 +51,8 @@ services:
       - DB_SSL=false
       - DB_SYNCHRONIZE=true
       - DB_USERNAME=mongodb
+      - APP_SUBSCRIBER_CONTENT_USER_IDS=5d8b7b90-83fd-4d04-a59c-589ab6bf71f2
+      - ADMIN_USER_EMAILS=lucas@bluecollardev.com,Atfehr.pt@gmail.com
   #    labels:
   #      - com.datadoghq.tags.service="user-svc"
   #      - com.datadoghq.tags.env="staging"
@@ -93,15 +95,17 @@ services:
       - DB_SSL=false
       - DB_SYNCHRONIZE=true
       - DB_USERNAME=mongodb
+      - APP_SUBSCRIBER_CONTENT_USER_IDS=5d8b7b90-83fd-4d04-a59c-589ab6bf71f2
+      - ADMIN_USER_EMAILS=lucas@bluecollardev.com,Atfehr.pt@gmail.com
   #    labels:
   #      - com.datadoghq.tags.service="media-svc"
   #      - com.datadoghq.tags.env="staging"
   #      - com.datadoghq.tags.version="0.0.1"
   db:
-    image: mongo:4.0.4
+    image: mongo:7.0
     container_name: db
     volumes:
-      - ms-mongo-data:/var/lib/mongodb/data
+      - ms-mongo-data:/data/db
     ports:
       - '27017:27017'
     networks:
