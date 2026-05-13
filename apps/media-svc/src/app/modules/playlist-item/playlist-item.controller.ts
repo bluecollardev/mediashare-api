@@ -60,7 +60,7 @@ export class PlaylistItemController {
       const sortIndex = createPlaylistItemDto?.sortIndex;
       const mediaItem = await this.mediaItemService.findOne(mediaId);
       delete mediaItem._id;
-      const playlistItem: Omit<PlaylistItem, '_id'> = {
+      const playlistItem: any = {
         isPlayable: false,
         uri: '',
         ...mediaItem,
@@ -68,10 +68,29 @@ export class PlaylistItemController {
         playlistId: playlistId,
         mediaId: mediaId,
         sortIndex,
-      } as any;
-      const result = await this.playlistItemService.create({
-        ...playlistItem,
-      } as any);
+      };
+      // The DTO uses @IsOptional + length constraints on summary /
+      // imageSrc — class-validator only skips on null/undefined,
+      // not on empty string. Drop empty optionals so a media item
+      // whose summary is '' (e.g. AFehr's library) doesn't 422.
+      if (!playlistItem.summary) delete playlistItem.summary;
+      if (!playlistItem.imageSrc) delete playlistItem.imageSrc;
+      // Visibility is @IsIn(MEDIA_VISIBILITY) and required. When the
+      // mediaItem mapping doesn't surface it (older docs / mapping
+      // quirks), default to the underlying mongo doc's value via a
+      // direct raw lookup. Bare 'private' is a safe last-resort
+      // fallback that satisfies validation.
+      if (!playlistItem.visibility) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { ObjectId } = require('mongodb');
+        const raw: any = await this.mediaItemService.dataService.repository
+          .aggregate([{ $match: { _id: new ObjectId(mediaId) } }])
+          .next();
+        playlistItem.visibility = raw?.visibility || 'private';
+      }
+      const result = await this.playlistItemService.create(
+        playlistItem as any
+      );
       return handleSuccessResponse(res, HttpStatus.CREATED, result);
     } catch (error) {
       return handleErrorResponse(res, error);
