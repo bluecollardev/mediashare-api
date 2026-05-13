@@ -19,6 +19,7 @@ import {
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ParamTokens, RouteTokens } from '@mediashare/core/constants';
+import { AdminGuard } from '../admin/admin.guard';
 import { MEDIA_VISIBILITY } from '../../core/models';
 import {
   PlaylistItemGetResponse,
@@ -146,6 +147,54 @@ export class PlaylistItemController {
               },
             },
           } as any
+        );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  /**
+   * Admin: suspend / unsuspend a playlist item. Sets isSuspended so
+   * feed + search queries can hide it from public surfaces.
+   */
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.playlistItemId, type: String, required: true })
+  @Post(`${RouteTokens.playlistItemId}/suspend`)
+  async suspendPlaylistItem(
+    @Res() res: Response,
+    @Param(ParamTokens.playlistItemId) playlistItemId: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result =
+        await this.playlistItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(playlistItemId) },
+          { $set: { isSuspended: true } } as any
+        );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.playlistItemId, type: String, required: true })
+  @Post(`${RouteTokens.playlistItemId}/unsuspend`)
+  async unsuspendPlaylistItem(
+    @Res() res: Response,
+    @Param(ParamTokens.playlistItemId) playlistItemId: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result =
+        await this.playlistItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(playlistItemId) },
+          { $set: { isSuspended: false } } as any
         );
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {

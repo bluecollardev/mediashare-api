@@ -38,6 +38,22 @@ export class AdminController {
             as: 'reporters',
           },
         },
+        // Also resolve the uploader so the UI can show name/email
+        // and the admin can suspend the user from this row.
+        {
+          $lookup: {
+            from: 'user',
+            localField: 'createdBy',
+            foreignField: 'sub',
+            as: 'uploaderArr',
+          },
+        },
+        {
+          $addFields: {
+            uploader: { $arrayElemAt: ['$uploaderArr', 0] },
+          },
+        },
+        { $project: { uploaderArr: 0 } },
       ];
 
       const [mediaRows, playlistRows] = await Promise.all([
@@ -90,7 +106,10 @@ export class AdminController {
               itemId: '$_id',
               title: '$title',
               imageSrc: '$imageSrc',
+              uri: '$uri',
               contentType,
+              uploaderSub: '$createdBy',
+              isSuspended: '$isSuspended',
               reason: '$reports.reason',
               comment: '$reports.comment',
               reportedAt: '$reports.reportedAt',
@@ -122,24 +141,58 @@ export class AdminController {
         grouped[sub].reports.push(row.entry);
       }
 
-      // Stitch the reporter's user record onto each group via a cross-
-      // collection lookup. mongoose/typeorm repos here are tied to a
-      // specific entity, so we reach down to the raw mongo client to
-      // query the `user` collection in the same db.
-      const subs = Object.keys(grouped).filter((s) => s !== 'anonymous');
-      if (subs.length > 0) {
+      // Stitch user records onto each group AND each entry via a
+      // single cross-collection lookup. mongoose/typeorm repos here
+      // are tied to a specific entity, so we reach down to the raw
+      // mongo client to query the `user` collection in the same db.
+      const reporterSubs = Object.keys(grouped).filter(
+        (s) => s !== 'anonymous'
+      );
+      const uploaderSubs = Array.from(
+        new Set(
+          Object.values(grouped).flatMap((g: any) =>
+            (g.reports || [])
+              .map((r: any) => r?.uploaderSub)
+              .filter((s: string) => !!s)
+          )
+        )
+      );
+      const allSubs = Array.from(new Set([...reporterSubs, ...uploaderSubs]));
+      if (allSubs.length > 0) {
         const db = (
           this.mediaItemService.dataService.repository as any
         ).manager.mongoQueryRunner.databaseConnection.db('mediashare');
         const users = await db
           .collection('user')
-          .find({ sub: { $in: subs } })
+          .find({ sub: { $in: allSubs } })
           .toArray();
         const usersBySub = new Map<string, any>(
           users.map((u: any) => [u.sub, u])
         );
-        for (const sub of subs) {
+        // Stitch reporter info onto each group.
+        for (const sub of reporterSubs) {
           grouped[sub].user = usersBySub.get(sub) || null;
+        }
+        // Stitch uploader display info onto each entry so the UI
+        // can render name + email without an extra round-trip.
+        for (const g of Object.values(grouped) as any[]) {
+          for (const r of g.reports || []) {
+            const u = r?.uploaderSub
+              ? usersBySub.get(r.uploaderSub) || null
+              : null;
+            if (u) {
+              r.uploader = {
+                _id: u._id,
+                sub: u.sub,
+                email: u.email,
+                username: u.username,
+                firstName: u.firstName,
+                lastName: u.lastName,
+                imageSrc: u.imageSrc,
+                isDisabled: !!u.isDisabled,
+              };
+            }
+          }
         }
       }
 

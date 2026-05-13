@@ -151,6 +151,11 @@ export class MediaItemDataService extends FilterableDataService<
       ]);
     }
 
+    // Hide content that admins have suspended. A separate $match
+    // stage is fine — the first stage already ran any $text query,
+    // and field-only matches can chain freely.
+    aggregateQuery.push({ $match: { isSuspended: { $ne: true } } });
+
     // Tags are not indexed as they're nested in the documents, so do this last!
     if (tags) {
       aggregateQuery = aggregateQuery.concat([

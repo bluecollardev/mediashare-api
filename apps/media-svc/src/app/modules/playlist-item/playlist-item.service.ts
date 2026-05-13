@@ -151,6 +151,9 @@ export class PlaylistItemDataService extends FilterableDataService<
       ]);
     }
 
+    // Hide content that admins have suspended.
+    aggregateQuery.push({ $match: { isSuspended: { $ne: true } } });
+
     // Tags are not indexed as they're nested in the documents, so do this last!
     if (tags) {
       aggregateQuery = aggregateQuery.concat([

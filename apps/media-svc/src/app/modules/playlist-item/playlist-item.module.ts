@@ -13,6 +13,7 @@ import {
   MediaItemService,
 } from '../media-item/media-item.service';
 import { MediaItem } from '../media-item/entities/media-item.entity';
+import { AdminGuard } from '../admin/admin.guard';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { MediaItem } from '../media-item/entities/media-item.entity';
     PlaylistItemMapping,
     MediaItemService,
     MediaItemDataService,
+    AdminGuard,
   ],
   exports: [PlaylistItemService],
 })

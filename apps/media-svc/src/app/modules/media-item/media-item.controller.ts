@@ -20,6 +20,7 @@ import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { MEDIA_VISIBILITY } from '../../core/models';
 import { ParamTokens, RouteTokens } from '@mediashare/core/constants';
+import { AdminGuard } from '../admin/admin.guard';
 import {
   MediaGetResponse,
   MediaPostResponse,
@@ -136,6 +137,52 @@ export class MediaItemController {
             },
           } as any
         );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  /**
+   * Admin: suspend / unsuspend a media item. Sets isSuspended on the
+   * doc so feed + search queries can filter it out.
+   */
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.mediaId, type: String, required: true })
+  @Post(`${RouteTokens.mediaId}/suspend`)
+  async suspendMediaItem(
+    @Res() res: Response,
+    @Param(ParamTokens.mediaId) mediaId: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result = await this.mediaItemService.dataService.repository.updateOne(
+        { _id: new ObjectId(mediaId) },
+        { $set: { isSuspended: true } } as any
+      );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.mediaId, type: String, required: true })
+  @Post(`${RouteTokens.mediaId}/unsuspend`)
+  async unsuspendMediaItem(
+    @Res() res: Response,
+    @Param(ParamTokens.mediaId) mediaId: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result = await this.mediaItemService.dataService.repository.updateOne(
+        { _id: new ObjectId(mediaId) },
+        { $set: { isSuspended: false } } as any
+      );
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);
