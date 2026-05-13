@@ -15,6 +15,7 @@ import { PlaylistItemModule } from './modules/playlist-item/playlist-item.module
 import { PlaylistModule } from './modules/playlist/playlist.module';
 import { SearchModule } from './modules/search/search.module';
 import { ShareItemModule } from './modules/share-item/share-item.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { appConfig, dbConfig, appValidationSchema } from './app.configuration';
 
 @Module({
@@ -59,6 +60,7 @@ import { appConfig, dbConfig, appValidationSchema } from './app.configuration';
     PlaylistModule,
     SearchModule,
     ShareItemModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
