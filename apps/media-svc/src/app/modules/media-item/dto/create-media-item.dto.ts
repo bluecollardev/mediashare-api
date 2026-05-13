@@ -17,11 +17,6 @@ export class CreateMediaItemDto {
   @ApiString({ required: true })
   key: string;
 
-  @IsDefined()
-  @AutoMap()
-  @ApiString({ required: true })
-  userId: string;
-
   @IsString()
   @AutoMap()
   @ApiString({ required: true })

@@ -57,6 +57,7 @@ export class PlaylistDataService extends FilterableDataService<
       tags,
       // TODO: Complete support for tagsMatchingMode (it's not exposed via controller)
       tagsMatchingMode = 'all', // all | any // TODO: Type this!
+      ownerOnly = false,
     }: SearchParameters = params;
 
     let aggregateQuery = [];
@@ -73,24 +74,47 @@ export class PlaylistDataService extends FilterableDataService<
       }
     }
 
-    // Match by user ID if it's available as it's indexed and this is the best way to reduce the number of results early
+    // Match by user ID if it's available as it's indexed and this is the best way to reduce the number of results early.
+    // Authenticated users see their own content UNION the configured app-subscriber-content
+    // creators' public/subscription playlists. This is what makes "master content user"
+    // visible to every authenticated subscriber.
     if (userId) {
+      // ownerOnly skips the subscriber-content branch — used by Library /
+      // "My Playlists" endpoints so AFehr's content doesn't appear there.
+      const matchClause = ownerOnly
+        ? { createdBy: userId }
+        : (() => {
+            const appSubscriberContentUserIds = this.configService.get(
+              'app.appSubscriberContentUserIds',
+              ['default']
+            );
+            return {
+              $or: [
+                { createdBy: userId },
+                {
+                  createdBy: {
+                    $in: appSubscriberContentUserIds.map((id) =>
+                      StringIdGuard(id)
+                    ),
+                  },
+                  visibility: {
+                    $in: [VISIBILITY_PUBLIC, VISIBILITY_SUBSCRIPTION],
+                  },
+                },
+              ],
+            };
+          })();
       aggregateQuery = aggregateQuery.concat([
         {
           $match: query
-            ? {
-                $text: { $search: query },
-                $and: [{ createdBy: userId }],
-              }
-            : {
-                $and: [{ createdBy: userId }],
-              },
+            ? { $text: { $search: query }, ...matchClause }
+            : matchClause,
         },
       ]);
     } else {
       // Only return search results that are app subscriber content (for paying app subscribers), shared content from a user's network, or public content
       const appSubscriberContentUserIds = this.configService.get(
-        'appSubscriberContentUserIds',
+        'app.appSubscriberContentUserIds',
         ['default']
       );
       aggregateQuery = aggregateQuery.concat([
@@ -132,6 +156,9 @@ export class PlaylistDataService extends FilterableDataService<
         },
       ]);
     }
+
+    // Hide content that admins have suspended.
+    aggregateQuery.push({ $match: { isSuspended: { $ne: true } } });
 
     // Tags are not indexed as they're nested in the documents, so do this last!
     if (tags) {
@@ -351,7 +378,7 @@ export class PlaylistService {
     return await this.dataService.getPopular();
   }
 
-  async search({ userId, query, tags }: SearchParameters) {
-    return await this.dataService.search({ userId, query, tags });
+  async search(params: SearchParameters) {
+    return await this.dataService.search(params);
   }
 }

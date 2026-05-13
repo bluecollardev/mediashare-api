@@ -34,6 +34,10 @@ async function bootstrap() {
     }
 
     const server = express();
+    // Disable auto-ETag — the rxjs ajax client used in the frontend
+    // throws on any non-2xx (including 304), so conditional GET
+    // breaks dispatched thunks.
+    server.set('etag', false);
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
     const globalPrefix = 'api';

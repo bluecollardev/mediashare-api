@@ -19,6 +19,7 @@ import {
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ParamTokens, RouteTokens } from '@mediashare/core/constants';
+import { AdminGuard } from '../admin/admin.guard';
 import { MEDIA_VISIBILITY } from '../../core/models';
 import {
   PlaylistItemGetResponse,
@@ -59,19 +60,35 @@ export class PlaylistItemController {
       const sortIndex = createPlaylistItemDto?.sortIndex;
       const mediaItem = await this.mediaItemService.findOne(mediaId);
       delete mediaItem._id;
-      const playlistItem: Omit<PlaylistItem, '_id'> = {
+      const playlistItem: any = {
         isPlayable: false,
         uri: '',
         ...mediaItem,
         createdBy,
-        userId: createdBy,
         playlistId: playlistId,
         mediaId: mediaId,
         sortIndex,
-      } as any;
-      const result = await this.playlistItemService.create({
-        ...playlistItem,
-      } as any);
+      };
+      // The DTO uses @IsOptional + length constraints on summary /
+      // imageSrc — class-validator only skips on null/undefined,
+      // not on empty string. Drop empty optionals so a media item
+      // whose summary is '' (e.g. AFehr's library) doesn't 422.
+      if (!playlistItem.summary) delete playlistItem.summary;
+      if (!playlistItem.imageSrc) delete playlistItem.imageSrc;
+      // Visibility is @IsIn(MEDIA_VISIBILITY) and required. When the
+      // mediaItem mapping doesn't surface it (older docs / mapping
+      // quirks), default to the underlying mongo doc's value via a
+      // direct raw lookup. Bare 'private' is a safe last-resort
+      // fallback that satisfies validation.
+      if (!playlistItem.visibility) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { ObjectId } = require('mongodb');
+        const raw: any = await this.mediaItemService.dataService.repository
+          .aggregate([{ $match: { _id: new ObjectId(mediaId) } }])
+          .next();
+        playlistItem.visibility = raw?.visibility || 'private';
+      }
+      const result = await this.playlistItemService.create(playlistItem as any);
       return handleSuccessResponse(res, HttpStatus.CREATED, result);
     } catch (error) {
       return handleErrorResponse(res, error);
@@ -109,6 +126,108 @@ export class PlaylistItemController {
   ) {
     try {
       const result = await this.playlistItemService.remove(playlistItemId);
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  /**
+   * Report a playlist item as inappropriate. Increments reportedCount
+   * and appends the report (reason / comment / reporter) to a
+   * `reports` array on the doc.
+   */
+  @UseGuards(AuthenticationGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.playlistItemId, type: String, required: true })
+  @Post(`${RouteTokens.playlistItemId}/report`)
+  async reportPlaylistItem(
+    @Res() res: Response,
+    @Param(ParamTokens.playlistItemId) playlistItemId: string,
+    @Body() body: { reason?: string; comment?: string },
+    @CognitoUser('sub') reporterSub: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result =
+        await this.playlistItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(playlistItemId) },
+          {
+            $inc: { reportedCount: 1 },
+            $push: {
+              reports: {
+                reason: body?.reason || 'unspecified',
+                comment: body?.comment || '',
+                reporterSub,
+                reportedAt: new Date(),
+              },
+            },
+          } as any
+        );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  /**
+   * Admin: suspend / unsuspend a playlist item. Sets isSuspended so
+   * feed + search queries can hide it from public surfaces.
+   */
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.playlistItemId, type: String, required: true })
+  @Post(`${RouteTokens.playlistItemId}/suspend`)
+  async suspendPlaylistItem(
+    @Res() res: Response,
+    @Param(ParamTokens.playlistItemId) playlistItemId: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result =
+        await this.playlistItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(playlistItemId) },
+          { $set: { isSuspended: true } } as any
+        );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: ParamTokens.playlistItemId, type: String, required: true })
+  @Post(`${RouteTokens.playlistItemId}/unsuspend`)
+  async unsuspendPlaylistItem(
+    @Res() res: Response,
+    @Param(ParamTokens.playlistItemId) playlistItemId: string
+  ) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { ObjectId } = require('mongodb');
+      const result =
+        await this.playlistItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(playlistItemId) },
+          { $set: { isSuspended: false } } as any
+        );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  // NOTE: declared BEFORE the `:playlistItemId` route so '/popular' doesn't
+  // get matched as `findOne('popular')` (which then fails ObjectIdGuard).
+  @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
+  @ApiBearerAuth()
+  @Get('popular')
+  @PlaylistItemGetResponse({ isArray: true })
+  async findPopular(@Res() res: Response) {
+    try {
+      const result = await this.playlistItemService.getPopular();
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);
@@ -161,19 +280,6 @@ export class PlaylistItemController {
         query || tags
           ? await this.playlistItemService.search({ query, tags: parsedTags })
           : await this.playlistItemService.search({});
-      return handleSuccessResponse(res, HttpStatus.OK, result);
-    } catch (error) {
-      return handleErrorResponse(res, error);
-    }
-  }
-
-  @UseGuards(AuthenticationGuard) // @UseGuards(AuthenticationGuard, UserGuard)
-  @ApiBearerAuth()
-  @Get('popular')
-  @PlaylistItemGetResponse({ isArray: true })
-  async findPopular(@Res() res: Response) {
-    try {
-      const result = await this.playlistItemService.getPopular();
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);

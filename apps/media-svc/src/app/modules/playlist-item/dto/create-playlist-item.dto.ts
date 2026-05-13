@@ -23,11 +23,6 @@ export class CreatePlaylistItemDto {
   @ApiString({ required: true })
   mediaId: string;
 
-  @IsDefined()
-  @AutoMap()
-  @ApiString({ required: true })
-  userId: string;
-
   @IsOptional()
   @AutoMap()
   @ApiString({ required: true })

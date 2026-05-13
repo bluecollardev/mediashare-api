@@ -33,6 +33,13 @@ async function bootstrap() {
     }
 
     const server = express();
+    // The rxjs ajax client used by the frontend treats any non-2xx
+    // status (including 304 Not Modified) as a hard failure, which
+    // rejects the dispatched thunk and leaves redux state stale.
+    // Disable Express's auto-ETag globally so every GET returns 200
+    // with the body — JSON APIs don't benefit from conditional GET
+    // here and the rxjs interop matters more.
+    server.set('etag', false);
     const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
     const globalPrefix = 'api';

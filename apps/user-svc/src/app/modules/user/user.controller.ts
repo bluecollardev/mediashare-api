@@ -36,7 +36,9 @@ import { ProfileDto } from './dto/profile.dto';
 import { UserService } from './user.service';
 import { UserGetResponse, UserPostResponse } from './user.decorator';
 import { UserGuard } from './user.guard';
+import { AdminGuard } from './admin.guard';
 import { GetUser } from '@mediashare/core/decorators/user.decorator';
+import { ConfigService } from '@nestjs/config';
 
 import { defaultImgUrl, defaultUserRole } from './user.constants';
 
@@ -45,9 +47,19 @@ import { defaultImgUrl, defaultUserRole } from './user.constants';
 export class UserController {
   constructor(
     private userService: UserService,
-    private userConnectionService: UserConnectionService /*private shareItemService: ShareItemService,
+    private userConnectionService: UserConnectionService,
+    private readonly configService: ConfigService /*private shareItemService: ShareItemService,
     private mediaItemService: MediaItemService*/
   ) {}
+
+  private isAdminEmail(email?: string): boolean {
+    if (!email) return false;
+    const whitelist = this.configService.get<string[]>(
+      'app.appAdminUserEmails',
+      []
+    );
+    return whitelist.includes(email.toLowerCase());
+  }
 
   @Post('authorize')
   @UseGuards(AuthenticationGuard)
@@ -224,8 +236,7 @@ export class UserController {
     }
   }
 
-  // TODO: Make sure only admins and test users can access this endpoint!
-  @UseGuards(AuthenticationGuard)
+  @UseGuards(AuthenticationGuard, AdminGuard)
   @ApiBearerAuth()
   @Post()
   @UserPostResponse({ type: UserDto })
@@ -234,6 +245,97 @@ export class UserController {
       // TODO: Only create if username and / or sub claim is unique!
       const result = await this.userService.create(createUserDto);
       return handleSuccessResponse(res, HttpStatus.CREATED, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  /**
+   * Admin: flip the isDisabled flag on a user. Used by Manage Users
+   * for single + bulk suspend. UI keys the suspended/active state off
+   * of `isDisabled` to avoid yet another schema field.
+   */
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: 'userId', type: String, required: true })
+  @Post('/admin/users/:userId/suspend')
+  async suspendUser(@Res() res: Response, @Param('userId') userId: string) {
+    try {
+      // Refuse to suspend another admin — admins can't be locked out
+      // by their peers. The whitelist (ADMIN_USER_EMAILS) is the
+      // source of truth; DB role is informational.
+      const target: any = await this.userService.dataService.repository
+        .aggregate([{ $match: { _id: this.toObjectId(userId) } }])
+        .next();
+      if (target && this.isAdminEmail(target.email)) {
+        return res.status(HttpStatus.FORBIDDEN).json({
+          statusCode: HttpStatus.FORBIDDEN,
+          message: 'Admin accounts cannot be suspended.',
+        });
+      }
+      const result = await this.userService.dataService.repository.updateOne(
+        { _id: this.toObjectId(userId) },
+        { $set: { isDisabled: true } }
+      );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @ApiParam({ name: 'userId', type: String, required: true })
+  @Post('/admin/users/:userId/unsuspend')
+  async unsuspendUser(@Res() res: Response, @Param('userId') userId: string) {
+    try {
+      const result = await this.userService.dataService.repository.updateOne(
+        { _id: this.toObjectId(userId) },
+        { $set: { isDisabled: false } }
+      );
+      return handleSuccessResponse(res, HttpStatus.OK, result);
+    } catch (error) {
+      return handleErrorResponse(res, error);
+    }
+  }
+
+  // Lazy ObjectId helper — keeps the import surface in this file
+  // small; an explicit module-level helper would be fine if more
+  // routes need it.
+  private toObjectId(id: string): any {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { ObjectId } = require('mongodb');
+    return new ObjectId(id);
+  }
+
+  /**
+   * Admin-only: list every user. Declared *before* `/:userId` so the
+   * literal 'admin' segment isn't matched as an id.
+   */
+  @UseGuards(AuthenticationGuard, AdminGuard)
+  @ApiBearerAuth()
+  @Get('/admin/users')
+  @UserGetResponse({ type: UserDto, isArray: true })
+  async listUsersForAdmin(@Res() res: Response) {
+    try {
+      // Use the mongo native aggregate() instead of TypeORM .find() —
+      // the latter returned [] in TypeORM 0.3 against this driver
+      // setup. An empty pipeline streams every document.
+      const rows = await this.userService.dataService.repository
+        .aggregate([])
+        .toArray();
+      const result = rows.map((u: any) => ({
+        ...u,
+        isAdmin: this.isAdminEmail(u?.email),
+      }));
+      // Express auto-generates an ETag; the rxjs ajax runtime treats
+      // any non-2xx (including 304 Not Modified) as a throw, which
+      // would reject the thunk and the admin list would appear empty
+      // on every refetch after the first. Force fresh on each call.
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);
     }
@@ -260,7 +362,14 @@ export class UserController {
   @UserGetResponse({ type: UserDto }) // TODO: Change this back to ProfileDto
   async getUser(@Res() res: Response, @Param('userId') userId: string) {
     try {
-      const result = await this.userService.findById(userId);
+      const isObjectId = /^[a-f0-9]{24}$/i.test(userId);
+      const result: any = isObjectId
+        ? await this.userService.findById(userId)
+        : await this.userService.findByQuery({ where: { sub: userId } });
+      // Stamp isAdmin so the Edit Account page can show the admin
+      // badge without an extra request. Matches the per-row stamp on
+      // the admin list endpoint.
+      if (result) result.isAdmin = this.isAdminEmail(result.email);
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);
@@ -273,7 +382,10 @@ export class UserController {
   @UserGetResponse({ type: UserDto }) // TODO: Change this back to ProfileDto
   async getCurrentUser(@Res() res: Response, @GetUser('_id') userId: string) {
     try {
-      const result = await this.userService.findById(userId);
+      const result: any = await this.userService.findById(userId);
+      // Cheap inline isAdmin flag so the frontend can gate UI off the
+      // already-fetched current-user payload — no extra request.
+      if (result) result.isAdmin = this.isAdminEmail(result.email);
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);
@@ -298,7 +410,7 @@ export class UserController {
     }
   }
 
-  @UseGuards(AuthenticationGuard)
+  @UseGuards(AuthenticationGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiParam({ name: 'userId', type: String, required: true })
   @ApiBody({ type: UpdateUserDto })
@@ -332,12 +444,21 @@ export class UserController {
     }
   }
 
-  @UseGuards(AuthenticationGuard)
+  @UseGuards(AuthenticationGuard, AdminGuard)
   @ApiBearerAuth()
   @ApiParam({ name: 'userId', type: String, required: true })
   @Delete('/:userId')
   async deleteUser(@Res() res: Response, @Param('userId') userId: string) {
     try {
+      const target: any = await this.userService.dataService.repository
+        .aggregate([{ $match: { _id: this.toObjectId(userId) } }])
+        .next();
+      if (target && this.isAdminEmail(target.email)) {
+        return res.status(HttpStatus.FORBIDDEN).json({
+          statusCode: HttpStatus.FORBIDDEN,
+          message: 'Admin accounts cannot be deleted.',
+        });
+      }
       const result = await this.userService.remove(userId);
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
