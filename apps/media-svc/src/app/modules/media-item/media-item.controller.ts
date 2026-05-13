@@ -158,10 +158,11 @@ export class MediaItemController {
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { ObjectId } = require('mongodb');
-      const result = await this.mediaItemService.dataService.repository.updateOne(
-        { _id: new ObjectId(mediaId) },
-        { $set: { isSuspended: true } } as any
-      );
+      const result =
+        await this.mediaItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(mediaId) },
+          { $set: { isSuspended: true } } as any
+        );
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);
@@ -179,10 +180,11 @@ export class MediaItemController {
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { ObjectId } = require('mongodb');
-      const result = await this.mediaItemService.dataService.repository.updateOne(
-        { _id: new ObjectId(mediaId) },
-        { $set: { isSuspended: false } } as any
-      );
+      const result =
+        await this.mediaItemService.dataService.repository.updateOne(
+          { _id: new ObjectId(mediaId) },
+          { $set: { isSuspended: false } } as any
+        );
       return handleSuccessResponse(res, HttpStatus.OK, result);
     } catch (error) {
       return handleErrorResponse(res, error);
