@@ -88,9 +88,7 @@ export class PlaylistItemController {
           .next();
         playlistItem.visibility = raw?.visibility || 'private';
       }
-      const result = await this.playlistItemService.create(
-        playlistItem as any
-      );
+      const result = await this.playlistItemService.create(playlistItem as any);
       return handleSuccessResponse(res, HttpStatus.CREATED, result);
     } catch (error) {
       return handleErrorResponse(res, error);
