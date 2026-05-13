@@ -68,10 +68,13 @@ describe('UserController.invite (QR + email)', () => {
     (userService.findById as any) = jest.fn(async () => profile);
 
     const res = createResponse();
-    await controller.invite(res as any, {
-      email: 'newuser@example.com',
-      username: 'newuser',
-    } as any);
+    await controller.invite(
+      res as any,
+      {
+        email: 'newuser@example.com',
+        username: 'newuser',
+      } as any
+    );
 
     expect(userService.create).toHaveBeenCalledTimes(1);
     const createArg = (userService.create as jest.Mock).mock.calls[0][0];
@@ -90,9 +93,7 @@ describe('AdminGuard (used by admin invite + Manage Users endpoints)', () => {
     ({
       switchToHttp: () => ({
         getRequest: () => ({
-          [COGNITO_JWT_PAYLOAD_CONTEXT_PROPERTY]: email
-            ? { email }
-            : {},
+          [COGNITO_JWT_PAYLOAD_CONTEXT_PROPERTY]: email ? { email } : {},
         }),
       }),
     } as any);
@@ -106,16 +107,12 @@ describe('AdminGuard (used by admin invite + Manage Users endpoints)', () => {
 
   it('allows a whitelisted email', () => {
     const guard = makeGuard(['lucas@bluecollardev.com']);
-    expect(guard.canActivate(buildCtx('lucas@bluecollardev.com'))).toBe(
-      true
-    );
+    expect(guard.canActivate(buildCtx('lucas@bluecollardev.com'))).toBe(true);
   });
 
   it('is case-insensitive on the token email (whitelist is lowercased at config load)', () => {
     const guard = makeGuard(['lucas@bluecollardev.com']);
-    expect(guard.canActivate(buildCtx('Lucas@BlueCollarDev.com'))).toBe(
-      true
-    );
+    expect(guard.canActivate(buildCtx('Lucas@BlueCollarDev.com'))).toBe(true);
   });
 
   it('rejects a non-whitelisted email with ForbiddenException', () => {
@@ -134,8 +131,8 @@ describe('AdminGuard (used by admin invite + Manage Users endpoints)', () => {
 
   it('rejects when the whitelist is empty (no admins configured)', () => {
     const guard = makeGuard([]);
-    expect(() => guard.canActivate(buildCtx('lucas@bluecollardev.com'))).toThrow(
-      ForbiddenException
-    );
+    expect(() =>
+      guard.canActivate(buildCtx('lucas@bluecollardev.com'))
+    ).toThrow(ForbiddenException);
   });
 });
