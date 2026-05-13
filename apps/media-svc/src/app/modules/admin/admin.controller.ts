@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, HttpStatus, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from '@nestjs-cognito/auth';
 import { Response } from 'express';
@@ -61,7 +55,9 @@ export class AdminController {
           ...r,
           contentType: 'playlistItem',
         })),
-      ].sort((a: any, b: any) => (b.reportedCount || 0) - (a.reportedCount || 0));
+      ].sort(
+        (a: any, b: any) => (b.reportedCount || 0) - (a.reportedCount || 0)
+      );
 
       // The rxjs ajax client throws on 304; keep responses fresh.
       res.setHeader('Cache-Control', 'no-store');
@@ -132,13 +128,16 @@ export class AdminController {
       // query the `user` collection in the same db.
       const subs = Object.keys(grouped).filter((s) => s !== 'anonymous');
       if (subs.length > 0) {
-        const db = (this.mediaItemService.dataService.repository as any).manager
-          .mongoQueryRunner.databaseConnection.db('mediashare');
+        const db = (
+          this.mediaItemService.dataService.repository as any
+        ).manager.mongoQueryRunner.databaseConnection.db('mediashare');
         const users = await db
           .collection('user')
           .find({ sub: { $in: subs } })
           .toArray();
-        const usersBySub = new Map<string, any>(users.map((u: any) => [u.sub, u]));
+        const usersBySub = new Map<string, any>(
+          users.map((u: any) => [u.sub, u])
+        );
         for (const sub of subs) {
           grouped[sub].user = usersBySub.get(sub) || null;
         }
